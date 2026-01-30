@@ -101,11 +101,12 @@ Suggest 3 creative recipes I can make using some or all of these ingredients. Re
     "description": "Brief description",
     "ingredients": ["ingredient1", "ingredient2"],
     "time": "cooking time",
-    "difficulty": "easy/medium/hard"
+    "difficulty": "easy/medium/hard",
+    "instructions": ["Step 1 instruction", "Step 2 instruction", "Step 3 instruction"]
   }
 ]
 
-Be creative and practical. No preamble or explanation, just the JSON array.`
+Include detailed step-by-step cooking instructions. Be creative and practical. No preamble or explanation, just the JSON array.`
           }]
         })
       });
@@ -161,6 +162,21 @@ Be creative and practical. No preamble or explanation, just the JSON array.`
           to { transform: rotate(360deg); }
         }
 
+        @keyframes cookingAnimation {
+          0%, 100% { 
+            transform: translateY(0) rotate(-5deg); 
+          }
+          25% { 
+            transform: translateY(-15px) rotate(5deg); 
+          }
+          50% { 
+            transform: translateY(0) rotate(-5deg); 
+          }
+          75% { 
+            transform: translateY(-10px) rotate(3deg); 
+          }
+        }
+
         .ingredient-chip {
           animation: slideUp 0.3s ease-out backwards;
         }
@@ -209,15 +225,25 @@ Be creative and practical. No preamble or explanation, just the JSON array.`
             gap: '12px',
             marginBottom: '10px'
           }}>
-            <ChefHat size={48} color="#fff" style={{ animation: 'bounce 2s ease-in-out infinite' }} />
             <h1 style={{
               fontSize: '42px',
               fontFamily: "'Fredoka', cursive",
               color: '#fff',
               margin: 0,
-              textShadow: '3px 3px 6px rgba(0,0,0,0.3)'
+              textShadow: '3px 3px 6px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '15px'
             }}>
-              Kitchen Magic
+              Kitchen
+              <span style={{
+                fontSize: '48px',
+                display: 'inline-block',
+                animation: 'bounce 2s ease-in-out infinite'
+              }}>
+                👨‍🍳🐱
+              </span>
+              Magic
             </h1>
           </div>
           <p style={{
@@ -406,6 +432,40 @@ Be creative and practical. No preamble or explanation, just the JSON array.`
           )}
         </div>
 
+        {/* Loading Animation - Cooking Cat */}
+        {loading && (
+          <div style={{
+            marginTop: '40px',
+            textAlign: 'center',
+            animation: 'slideUp 0.5s ease-out'
+          }}>
+            <div style={{
+              marginBottom: '20px'
+            }}>
+              <img 
+                src="https://media.tenor.com/zWgPObq1HIEAAAAM/cat-cooking.gif"
+                alt="Chef cat cooking"
+                style={{
+                  width: '200px',
+                  height: '200px',
+                  borderRadius: '50%',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  background: 'white',
+                  padding: '10px'
+                }}
+              />
+            </div>
+            <p style={{
+              color: '#fff',
+              fontSize: '18px',
+              fontWeight: '600',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+            }}>
+              Chef Whiskers is cooking up something special...
+            </p>
+          </div>
+        )}
+
         {/* Recipes Display */}
         {recipes.length > 0 && (
           <div style={{
@@ -417,9 +477,15 @@ Be creative and practical. No preamble or explanation, just the JSON array.`
               color: '#fff',
               marginBottom: '16px',
               textAlign: 'center',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+              textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px'
             }}>
-              Your Recipe Ideas 🍳
+              <span style={{ fontSize: '32px' }}>🐱</span>
+              Your Recipe Ideas
+              <span style={{ fontSize: '32px' }}>🍳</span>
             </h2>
             
             {recipes.map((recipe, index) => (
@@ -516,6 +582,44 @@ Be creative and practical. No preamble or explanation, just the JSON array.`
                     ))}
                   </div>
                 </div>
+
+                {recipe.instructions && recipe.instructions.length > 0 && (
+                  <div style={{
+                    borderTop: '2px dashed #e2e8f0',
+                    paddingTop: '12px',
+                    marginTop: '12px'
+                  }}>
+                    <p style={{
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      color: '#667eea',
+                      marginBottom: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      👨‍🍳 Cooking Instructions:
+                    </p>
+                    <ol style={{
+                      margin: '0',
+                      paddingLeft: '20px',
+                      color: '#4a5568'
+                    }}>
+                      {recipe.instructions.map((instruction, i) => (
+                        <li
+                          key={i}
+                          style={{
+                            fontSize: '14px',
+                            lineHeight: '1.6',
+                            marginBottom: '8px'
+                          }}
+                        >
+                          {instruction}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
               </div>
             ))}
           </div>
