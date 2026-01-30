@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight } from 'lucide-react';
+import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight, Lightbulb } from 'lucide-react';
 
 export default function RecipeGenerator() {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -10,6 +10,7 @@ export default function RecipeGenerator() {
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [showTerms, setShowTerms] = useState(false);
+  const [recipeCount, setRecipeCount] = useState(5);
   const fileInputRef = useRef(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -85,7 +86,6 @@ export default function RecipeGenerator() {
     setRecipes([]);
 
     const coreIngredients = ['salt', 'pepper', 'onion', 'cheese', 'garlic powder', 'onion powder'];
-    const allIngredients = [...new Set([...ingredients, ...coreIngredients])];
 
     try {
       const response = await fetch('/.netlify/functions/anthropic', {
@@ -100,7 +100,17 @@ export default function RecipeGenerator() {
 
 You can also assume I have these common pantry items available: salt, pepper, onion, cheese, garlic powder, onion powder.
 
-Suggest 3 simple, everyday recipes that a regular person would make at home. Focus on common meals like sandwiches, pasta, stir-fries, casseroles, breakfast foods, etc. - NOT fancy restaurant dishes. Keep it practical and easy. Return ONLY a JSON array with this exact format:
+Suggest ${recipeCount} diverse recipes ranging from simple everyday meals to creative/gourmet dishes. Mix it up with:
+- Simple comfort food (sandwiches, pasta, basic dinners)
+- Creative/interesting combinations
+- International cuisine variations
+- Quick meals and more elaborate dishes
+
+For each recipe, include:
+1. Recipes using ONLY my current ingredients
+2. Creative variations that might need 1-2 additional ingredients (mark these clearly as "optional additions")
+
+Return ONLY a JSON array with this exact format:
 [
   {
     "name": "Recipe Name",
@@ -108,11 +118,13 @@ Suggest 3 simple, everyday recipes that a regular person would make at home. Foc
     "ingredients": ["ingredient1", "ingredient2"],
     "time": "cooking time",
     "difficulty": "easy/medium/hard",
+    "creativityLevel": "simple/creative/gourmet",
+    "optionalAdditions": ["optional ingredient 1", "optional ingredient 2"],
     "instructions": ["Step 1 instruction", "Step 2 instruction", "Step 3 instruction"]
   }
 ]
 
-Include clear step-by-step cooking instructions. Make recipes that feel like home cooking, not gourmet meals. No preamble or explanation, just the JSON array.`
+Be diverse in your suggestions - include both practical everyday meals and more adventurous creative options. No preamble or explanation, just the JSON array.`
           }]
         })
       });
@@ -431,7 +443,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
     );
   }
 
-  // Main App (existing code continues...)
+  // Main App
   return (
     <div style={{
       minHeight: '100vh',
@@ -494,7 +506,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
       `}</style>
 
       <div style={{
-        maxWidth: '800px',
+        maxWidth: '900px',
         margin: '0 auto'
       }}>
         {/* Header */}
@@ -690,6 +702,48 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
             </div>
           )}
 
+          {/* Recipe Count Selector */}
+          {ingredients.length > 0 && (
+            <div style={{
+              marginTop: '25px',
+              padding: '20px',
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '6px'
+            }}>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#d4af37',
+                marginBottom: '12px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase'
+              }}>
+                Number of Recipes: {recipeCount}
+              </label>
+              <input
+                type="range"
+                min="3"
+                max="10"
+                value={recipeCount}
+                onChange={(e) => setRecipeCount(parseInt(e.target.value))}
+                style={{
+                  width: '100%',
+                  accentColor: '#d4af37'
+                }}
+              />
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: '8px'
+              }}>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>3</span>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>10</span>
+              </div>
+            </div>
+          )}
+
           {ingredients.length > 0 && (
             <button
               className="button"
@@ -728,19 +782,18 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
               display: 'flex',
               justifyContent: 'center'
             }}>
-              <div style={{
-                width: '150px',
-                height: '150px',
-                borderRadius: '50%',
-                background: 'rgba(26, 26, 26, 0.8)',
-                border: '2px solid rgba(212, 175, 55, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '60px'
-              }}>
-                👨‍🍳
-              </div>
+              <img 
+                src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdTM5cjM3YzlxMGQzaThtNmtkdXU1NDJzcG1sYzBpOXFmMjh3a3VrOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1vnAdLgAmPqV5WcJ4W/giphy.gif"
+                alt="Chef preparing"
+                style={{
+                  width: '180px',
+                  height: '180px',
+                  borderRadius: '50%',
+                  border: '2px solid rgba(212, 175, 55, 0.3)',
+                  background: 'rgba(26, 26, 26, 0.8)',
+                  padding: '10px'
+                }}
+              />
             </div>
             <p style={{
               color: 'rgba(255,255,255,0.9)',
@@ -768,7 +821,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
               textTransform: 'uppercase',
               textAlign: 'center'
             }}>
-              Your Curated Recipes
+              Your Curated Recipes ({recipes.length})
             </h2>
             
             {recipes.map((recipe, index) => (
@@ -776,7 +829,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 key={index}
                 className="recipe-card"
                 style={{
-                  animationDelay: `${index * 0.15}s`,
+                  animationDelay: `${index * 0.1}s`,
                   background: 'rgba(26, 26, 26, 0.6)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
@@ -786,16 +839,46 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                   backdropFilter: 'blur(10px)'
                 }}
               >
-                <h3 style={{
-                  fontSize: '24px',
-                  fontWeight: '400',
-                  color: '#ffffff',
-                  marginTop: 0,
-                  marginBottom: '12px',
-                  letterSpacing: '1px'
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: '12px'
                 }}>
-                  {recipe.name}
-                </h3>
+                  <h3 style={{
+                    fontSize: '24px',
+                    fontWeight: '400',
+                    color: '#ffffff',
+                    margin: 0,
+                    letterSpacing: '1px',
+                    flex: 1
+                  }}>
+                    {recipe.name}
+                  </h3>
+                  {recipe.creativityLevel && (
+                    <span style={{
+                      fontSize: '11px',
+                      padding: '4px 10px',
+                      borderRadius: '4px',
+                      background: recipe.creativityLevel === 'gourmet' ? 'rgba(212, 175, 55, 0.2)' : 
+                                  recipe.creativityLevel === 'creative' ? 'rgba(100, 150, 255, 0.2)' : 
+                                  'rgba(100, 255, 150, 0.2)',
+                      color: recipe.creativityLevel === 'gourmet' ? '#d4af37' : 
+                             recipe.creativityLevel === 'creative' ? '#6496ff' : 
+                             '#64ff96',
+                      border: `1px solid ${recipe.creativityLevel === 'gourmet' ? 'rgba(212, 175, 55, 0.4)' : 
+                                          recipe.creativityLevel === 'creative' ? 'rgba(100, 150, 255, 0.4)' : 
+                                          'rgba(100, 255, 150, 0.4)'}`,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      fontWeight: '600'
+                    }}>
+                      {recipe.creativityLevel === 'gourmet' ? '✨ Gourmet' : 
+                       recipe.creativityLevel === 'creative' ? '💡 Creative' : 
+                       '🍽️ Simple'}
+                    </span>
+                  )}
+                </div>
                 
                 <p style={{
                   color: 'rgba(255,255,255,0.6)',
@@ -877,6 +960,54 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                     ))}
                   </div>
                 </div>
+
+                {recipe.optionalAdditions && recipe.optionalAdditions.length > 0 && (
+                  <div style={{
+                    borderTop: '1px solid rgba(100, 150, 255, 0.2)',
+                    paddingTop: '20px',
+                    marginTop: '20px',
+                    background: 'rgba(100, 150, 255, 0.05)',
+                    padding: '20px',
+                    borderRadius: '6px'
+                  }}>
+                    <p style={{
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6496ff',
+                      marginBottom: '12px',
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      <Lightbulb size={14} />
+                      Optional Additions (Enhance This Dish)
+                    </p>
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '8px'
+                    }}>
+                      {recipe.optionalAdditions.map((ing, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            background: 'rgba(100, 150, 255, 0.1)',
+                            border: '1px solid rgba(100, 150, 255, 0.3)',
+                            color: '#6496ff',
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: '400'
+                          }}
+                        >
+                          + {ing}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {recipe.instructions && recipe.instructions.length > 0 && (
                   <div style={{
