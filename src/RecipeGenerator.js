@@ -10,8 +10,8 @@
  * from Monarch-Elite Holdings.
  */
 
-import React, { useState, useRef } from 'react';
-import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight, Lightbulb } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight, Lightbulb, Download } from 'lucide-react';
 
 export default function RecipeGenerator() {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -23,9 +23,43 @@ export default function RecipeGenerator() {
   const [capturedImage, setCapturedImage] = useState(null);
   const [showTerms, setShowTerms] = useState(false);
   const [recipeCount, setRecipeCount] = useState(5);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const fileInputRef = useRef(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+
+  // PWA Install Prompt Handler
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallPrompt(true);
+    };
+    
+    window.addEventListener('beforeinstallprompt', handler);
+    
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setShowInstallPrompt(false);
+    }
+    
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('App installed successfully');
+    }
+    
+    setDeferredPrompt(null);
+    setShowInstallPrompt(false);
+  };
 
   const addIngredient = () => {
     if (inputValue.trim()) {
@@ -218,6 +252,43 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             border-radius: 3px;
           }
         `}</style>
+
+        {/* Install App Prompt - Welcome Screen */}
+        {showInstallPrompt && (
+          <div style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 1001,
+            animation: 'slideUp 0.5s ease-out'
+          }}>
+            <button
+              onClick={handleInstallClick}
+              style={{
+                padding: '12px 20px',
+                background: '#d4af37',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#000000',
+                fontSize: '12px',
+                fontWeight: '600',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              <Download size={16} />
+              Install App
+            </button>
+          </div>
+        )}
 
         <div style={{
           maxWidth: '700px',
@@ -539,6 +610,43 @@ Be diverse in your suggestions - include both practical everyday meals and more 
           transform: translateY(0);
         }
       `}</style>
+
+      {/* Install App Prompt - Main App */}
+      {showInstallPrompt && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1001,
+          animation: 'slideUp 0.5s ease-out'
+        }}>
+          <button
+            onClick={handleInstallClick}
+            style={{
+              padding: '12px 20px',
+              background: '#d4af37',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#000000',
+              fontSize: '12px',
+              fontWeight: '600',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(212, 175, 55, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+          >
+            <Download size={16} />
+            Install App
+          </button>
+        </div>
+      )}
 
       <div style={{
         maxWidth: '900px',
