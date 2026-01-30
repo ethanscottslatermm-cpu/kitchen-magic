@@ -83,6 +83,10 @@ export default function RecipeGenerator() {
     setLoading(true);
     setRecipes([]);
 
+    // Core pantry items that are always assumed to be available
+    const coreIngredients = ['salt', 'pepper', 'onion', 'cheese', 'garlic powder', 'onion powder'];
+    const allIngredients = [...new Set([...ingredients, ...coreIngredients])]; // Remove duplicates
+
     try {
       const response = await fetch('/.netlify/functions/anthropic', {
         method: 'POST',
@@ -93,6 +97,8 @@ export default function RecipeGenerator() {
           messages: [{
             role: 'user',
             content: `I have these ingredients: ${ingredients.join(', ')}. 
+
+You can also assume I have these common pantry items available: salt, pepper, onion, cheese, garlic powder, onion powder.
 
 Suggest 3 simple, everyday recipes that a regular person would make at home. Focus on common meals like sandwiches, pasta, stir-fries, casseroles, breakfast foods, etc. - NOT fancy restaurant dishes. Keep it practical and easy. Return ONLY a JSON array with this exact format:
 [
@@ -128,7 +134,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #1a2332 0%, #2d3748 100%)',
       fontFamily: "'Quicksand', 'Comic Neue', cursive",
       padding: '20px',
       animation: 'fadeIn 0.6s ease-out'
@@ -241,7 +247,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 display: 'inline-block',
                 animation: 'bounce 2s ease-in-out infinite'
               }}>
-                🧑‍🍳
+                🐱
               </span>
               Magic
             </h1>
@@ -267,7 +273,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
           <h2 style={{
             fontSize: '22px',
             fontWeight: '600',
-            color: '#667eea',
+            color: '#4a90e2',
             marginTop: 0,
             marginBottom: '16px',
             display: 'flex',
@@ -290,7 +296,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
               style={{
                 flex: 1,
                 padding: '14px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #2c5282 0%, #2d3748 100%)',
                 border: 'none',
                 borderRadius: '16px',
                 color: 'white',
@@ -301,7 +307,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                boxShadow: '0 4px 12px rgba(44, 82, 130, 0.4)'
               }}
             >
               <Camera size={20} />
@@ -338,7 +344,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 outline: 'none',
                 transition: 'border-color 0.2s'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#667eea'}
+              onFocus={(e) => e.target.style.borderColor = '#2c5282'}
               onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
             />
             <button
@@ -411,7 +417,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 width: '100%',
                 marginTop: '16px',
                 padding: '16px',
-                background: loading ? '#cbd5e0' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                background: loading ? '#cbd5e0' : 'linear-gradient(135deg, #2c5282 0%, #3182ce 100%)',
                 border: 'none',
                 borderRadius: '16px',
                 color: 'white',
@@ -422,7 +428,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '10px',
-                boxShadow: loading ? 'none' : '0 6px 16px rgba(245, 87, 108, 0.4)',
+                boxShadow: loading ? 'none' : '0 6px 16px rgba(44, 82, 130, 0.4)',
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
@@ -515,7 +521,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 <h3 style={{
                   fontSize: '22px',
                   fontWeight: '700',
-                  color: '#764ba2',
+                  color: '#2c5282',
                   marginTop: 0,
                   marginBottom: '8px'
                 }}>
@@ -603,7 +609,7 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                     <p style={{
                       fontSize: '14px',
                       fontWeight: '700',
-                      color: '#667eea',
+                      color: '#2c5282',
                       marginBottom: '8px',
                       display: 'flex',
                       alignItems: 'center',
