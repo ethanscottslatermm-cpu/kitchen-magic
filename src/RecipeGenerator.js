@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2026 Monarch-Elite Holdings
+ * All Rights Reserved
+ * 
+ * This source code is licensed under the proprietary license found in the
+ * LICENSE file in the root directory of this source tree.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this software,
+ * via any medium, is strictly prohibited without explicit written permission
+ * from Monarch-Elite Holdings.
+ */
+
 import React, { useState, useRef } from 'react';
 import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight, Lightbulb } from 'lucide-react';
 
@@ -435,7 +447,7 @@ Be diverse in your suggestions - include both practical everyday meals and more 
               fontWeight: '300',
               letterSpacing: '0.5px'
             }}>
-              Powered by <span style={{ color: '#d4af37', fontWeight: '500' }}>Monarch-Elite Holdings</span>
+              © 2026 <span style={{ color: '#d4af37', fontWeight: '500' }}>Monarch-Elite Holdings</span>. All Rights Reserved.
             </p>
           </div>
         </div>
@@ -1066,7 +1078,7 @@ Be diverse in your suggestions - include both practical everyday meals and more 
           fontWeight: '300',
           letterSpacing: '0.5px'
         }}>
-          Powered by <span style={{ color: '#d4af37', fontWeight: '500' }}>Monarch-Elite Holdings</span>
+          © 2026 <span style={{ color: '#d4af37', fontWeight: '500' }}>Monarch-Elite Holdings</span>. All Rights Reserved.
         </p>
       </div>
     </div>
