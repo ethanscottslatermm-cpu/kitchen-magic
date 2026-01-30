@@ -187,6 +187,17 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             }
           }
 
+          @keyframes fadeInText {
+            from { 
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
           .terms-content {
             max-height: 300px;
             overflow-y: auto;
@@ -252,9 +263,10 @@ Be diverse in your suggestions - include both practical everyday meals and more 
               margin: 0,
               letterSpacing: '3px',
               fontWeight: '300',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              animation: 'fadeInText 1s ease-out 0.5s backwards'
             }}>
-              Executive Recipe Generator
+              Welcome Chef
             </p>
           </div>
 
@@ -483,6 +495,17 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             transform: translateY(0);
           }
         }
+
+        @keyframes fadeInText {
+          from { 
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
         
         @keyframes pulse {
           0%, 100% { opacity: 0.6; }
@@ -559,14 +582,15 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             }}></div>
           </div>
           <p style={{
-            color: 'rgba(255,255,255,0.6)',
+            color: '#d4af37',
             fontSize: '14px',
             margin: 0,
             letterSpacing: '3px',
             fontWeight: '300',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            animation: 'fadeInText 1s ease-out 0.5s backwards'
           }}>
-            Executive Recipe Generator
+            Welcome Chef
           </p>
         </div>
 
