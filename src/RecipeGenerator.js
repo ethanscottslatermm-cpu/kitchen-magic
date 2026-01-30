@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Plus, X, ChefHat, Sparkles, Trash2, UtensilsCrossed } from 'lucide-react';
+import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight } from 'lucide-react';
 
 export default function RecipeGenerator() {
+  const [showWelcome, setShowWelcome] = useState(true);
   const [ingredients, setIngredients] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
+  const [showTerms, setShowTerms] = useState(false);
   const fileInputRef = useRef(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -129,13 +131,315 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
     setLoading(false);
   };
 
+  // Welcome Screen
+  if (showWelcome) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+        fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+        padding: '40px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        animation: 'fadeIn 0.6s ease-out'
+      }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+          
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .terms-content {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+          }
+
+          .terms-content::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          .terms-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+          }
+
+          .terms-content::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.5);
+            border-radius: 3px;
+          }
+        `}</style>
+
+        <div style={{
+          maxWidth: '700px',
+          width: '100%',
+          animation: 'slideUp 0.6s ease-out'
+        }}>
+          {/* Logo/Title */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '50px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '20px',
+              marginBottom: '15px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '2px',
+                background: 'linear-gradient(90deg, transparent, #d4af37)',
+              }}></div>
+              <h1 style={{
+                fontSize: '56px',
+                fontWeight: '300',
+                color: '#ffffff',
+                margin: 0,
+                letterSpacing: '10px',
+                textTransform: 'uppercase'
+              }}>
+                CHEF
+              </h1>
+              <div style={{
+                width: '60px',
+                height: '2px',
+                background: 'linear-gradient(90deg, #d4af37, transparent)',
+              }}></div>
+            </div>
+            <p style={{
+              color: '#d4af37',
+              fontSize: '14px',
+              margin: 0,
+              letterSpacing: '3px',
+              fontWeight: '300',
+              textTransform: 'uppercase'
+            }}>
+              Executive Recipe Generator
+            </p>
+          </div>
+
+          {/* Welcome Card */}
+          <div style={{
+            background: 'rgba(26, 26, 26, 0.8)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            padding: '50px',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '32px',
+              fontWeight: '300',
+              color: '#ffffff',
+              marginTop: 0,
+              marginBottom: '15px',
+              letterSpacing: '2px'
+            }}>
+              Welcome Back
+            </h2>
+            
+            <p style={{
+              color: 'rgba(255,255,255,0.7)',
+              fontSize: '15px',
+              lineHeight: '1.8',
+              marginBottom: '35px',
+              fontWeight: '300'
+            }}>
+              Your personal culinary assistant powered by advanced AI technology. 
+              Transform your available ingredients into exceptional meals with precision and ease.
+            </p>
+
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '6px',
+              padding: '25px',
+              marginBottom: '35px'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '15px'
+              }}>
+                <h3 style={{
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: '#d4af37',
+                  margin: 0,
+                  letterSpacing: '1.5px',
+                  textTransform: 'uppercase'
+                }}>
+                  Terms & Conditions
+                </h3>
+                <button
+                  onClick={() => setShowTerms(!showTerms)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'rgba(255,255,255,0.6)',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    fontFamily: 'inherit',
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  {showTerms ? 'Hide' : 'Read Full Terms'}
+                </button>
+              </div>
+
+              {showTerms ? (
+                <div className="terms-content" style={{
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '12px',
+                  lineHeight: '1.7',
+                  fontWeight: '300'
+                }}>
+                  <p style={{ marginTop: '10px', marginBottom: '10px' }}><strong>Last Updated:</strong> January 2026</p>
+                  
+                  <p style={{ marginBottom: '15px' }}>
+                    By accessing and using this Executive Recipe Generator ("Service"), you agree to be bound by these Terms and Conditions. Please read them carefully before proceeding.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>1. Acceptance of Terms</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    By using this Service, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree, please discontinue use immediately.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>2. Service Description</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    The Service provides AI-powered recipe suggestions based on user-provided ingredients. Recipes are generated for informational and convenience purposes only.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>3. User Responsibilities</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    You are responsible for verifying the accuracy and safety of all recipes. Users should exercise proper food safety practices and be aware of personal dietary restrictions, allergies, and health conditions. We are not liable for any adverse effects resulting from recipe preparation or consumption.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>4. Intellectual Property</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    All content, design, and functionality of the Service are owned by Monarch-Elite Holdings and protected by intellectual property laws. Unauthorized reproduction or distribution is prohibited.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>5. Privacy & Data</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    Ingredient data and uploaded images are processed to generate recipes. We do not store personal data beyond what is necessary for Service functionality. By using the Service, you consent to this processing.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>6. Disclaimers</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    The Service is provided "as is" without warranties of any kind. We do not guarantee the accuracy, completeness, or suitability of recipes. Users assume all risk associated with recipe preparation and consumption.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>7. Limitation of Liability</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    Monarch-Elite Holdings shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from use of the Service, including but not limited to food-related injuries, allergic reactions, or property damage.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>8. Modifications</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    We reserve the right to modify these Terms at any time. Continued use of the Service constitutes acceptance of modified Terms.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>9. Governing Law</strong></p>
+                  <p style={{ marginBottom: '15px' }}>
+                    These Terms shall be governed by and construed in accordance with applicable laws, without regard to conflict of law principles.
+                  </p>
+
+                  <p style={{ marginTop: '15px', marginBottom: '8px' }}><strong>10. Contact</strong></p>
+                  <p style={{ marginBottom: '5px' }}>
+                    For questions regarding these Terms, please contact: legal@monarch-elite.com
+                  </p>
+                </div>
+              ) : (
+                <p style={{
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '13px',
+                  lineHeight: '1.7',
+                  margin: 0,
+                  fontWeight: '300'
+                }}>
+                  By proceeding, you agree to our Terms and Conditions. This Service provides AI-generated recipe suggestions based on your ingredients. You are responsible for verifying recipe safety and accuracy.
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowWelcome(false)}
+              style={{
+                width: '100%',
+                padding: '18px',
+                background: '#d4af37',
+                border: 'none',
+                borderRadius: '4px',
+                color: '#000000',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'inherit',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              Continue to Generator
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {/* Footer */}
+          <div style={{
+            marginTop: '30px',
+            textAlign: 'left',
+            paddingLeft: '10px'
+          }}>
+            <p style={{
+              color: 'rgba(255,255,255,0.4)',
+              fontSize: '11px',
+              margin: 0,
+              fontWeight: '300',
+              letterSpacing: '0.5px'
+            }}>
+              Powered by <span style={{ color: '#d4af37', fontWeight: '500' }}>Monarch-Elite Holdings</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main App (existing code continues...)
   return (
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
       padding: '40px 20px',
-      animation: 'fadeIn 0.6s ease-out'
+      animation: 'fadeIn 0.6s ease-out',
+      position: 'relative'
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -615,6 +919,24 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
             ))}
           </div>
         )}
+      </div>
+
+      {/* Footer - Always visible on main app */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        zIndex: 1000
+      }}>
+        <p style={{
+          color: 'rgba(255,255,255,0.3)',
+          fontSize: '11px',
+          margin: 0,
+          fontWeight: '300',
+          letterSpacing: '0.5px'
+        }}>
+          Powered by <span style={{ color: '#d4af37', fontWeight: '500' }}>Monarch-Elite Holdings</span>
+        </p>
       </div>
     </div>
   );
