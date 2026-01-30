@@ -156,6 +156,8 @@ For each recipe, include:
 1. Recipes using ONLY my current ingredients
 2. Creative variations that might need 1-2 additional ingredients (mark these clearly as "optional additions")
 
+CRITICAL: You MUST return ONLY valid JSON. No markdown, no backticks, no explanation text.
+
 Return ONLY a JSON array with this exact format:
 [
   {
@@ -170,20 +172,49 @@ Return ONLY a JSON array with this exact format:
   }
 ]
 
-Be diverse in your suggestions - include both practical everyday meals and more adventurous creative options. No preamble or explanation, just the JSON array.`
+Be diverse in your suggestions - include both practical everyday meals and more adventurous creative options. Return ONLY the JSON array, nothing else.`
           }]
         })
       });
 
       const data = await response.json();
-      const text = data.content[0].text.trim();
-      const cleanText = text.replace(/```json|```/g, '').trim();
-      const generatedRecipes = JSON.parse(cleanText);
+      
+      // Get the text response
+      let text = data.content[0].text.trim();
+      
+      // Remove markdown code blocks if present
+      text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      
+      // Remove any text before the first [ or after the last ]
+      const firstBracket = text.indexOf('[');
+      const lastBracket = text.lastIndexOf(']');
+      
+      if (firstBracket === -1 || lastBracket === -1) {
+        throw new Error('Invalid JSON response - no array found');
+      }
+      
+      text = text.substring(firstBracket, lastBracket + 1);
+      
+      // Try to parse the JSON
+      let generatedRecipes;
+      try {
+        generatedRecipes = JSON.parse(text);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError);
+        console.error('Attempted to parse:', text);
+        
+        // Show a more helpful error message
+        throw new Error('Could not parse recipe JSON. Please try again with different ingredients or fewer recipes.');
+      }
+      
+      if (!Array.isArray(generatedRecipes) || generatedRecipes.length === 0) {
+        throw new Error('No recipes were generated. Please try again.');
+      }
       
       setRecipes(generatedRecipes);
     } catch (error) {
       console.error('Error generating recipes:', error);
-      alert('Could not generate recipes. Please try again.');
+      alert(`Could not generate recipes: ${error.message}\n\nTry using fewer ingredients or reducing the number of recipes.`);
     }
 
     setLoading(false);
