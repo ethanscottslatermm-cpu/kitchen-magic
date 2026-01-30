@@ -94,7 +94,7 @@ export default function RecipeGenerator() {
             role: 'user',
             content: `I have these ingredients: ${ingredients.join(', ')}. 
 
-Suggest 3 creative recipes I can make using some or all of these ingredients. Return ONLY a JSON array with this exact format:
+Suggest 3 simple, everyday recipes that a regular person would make at home. Focus on common meals like sandwiches, pasta, stir-fries, casseroles, breakfast foods, etc. - NOT fancy restaurant dishes. Keep it practical and easy. Return ONLY a JSON array with this exact format:
 [
   {
     "name": "Recipe Name",
@@ -106,7 +106,7 @@ Suggest 3 creative recipes I can make using some or all of these ingredients. Re
   }
 ]
 
-Include detailed step-by-step cooking instructions. Be creative and practical. No preamble or explanation, just the JSON array.`
+Include clear step-by-step cooking instructions. Make recipes that feel like home cooking, not gourmet meals. No preamble or explanation, just the JSON array.`
           }]
         })
       });
@@ -241,7 +241,7 @@ Include detailed step-by-step cooking instructions. Be creative and practical. N
                 display: 'inline-block',
                 animation: 'bounce 2s ease-in-out infinite'
               }}>
-                👨‍🍳🐱
+                🧑‍🍳
               </span>
               Magic
             </h1>
@@ -483,7 +483,7 @@ Include detailed step-by-step cooking instructions. Be creative and practical. N
               justifyContent: 'center',
               gap: '12px'
             }}>
-              <span style={{ fontSize: '32px' }}>🐱</span>
+              <span style={{ fontSize: '32px' }}>🍽️</span>
               Your Recipe Ideas
               <span style={{ fontSize: '32px' }}>🍳</span>
             </h2>
@@ -498,9 +498,20 @@ Include detailed step-by-step cooking instructions. Be creative and practical. N
                   borderRadius: '20px',
                   padding: '24px',
                   marginBottom: '16px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                  position: 'relative'
                 }}
               >
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  fontSize: '40px',
+                  opacity: '0.3'
+                }}>
+                  🍴
+                </div>
+                
                 <h3 style={{
                   fontSize: '22px',
                   fontWeight: '700',
