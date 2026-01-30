@@ -32,7 +32,6 @@ export default function RecipeGenerator() {
       const base64Image = event.target.result.split(',')[1];
       setCapturedImage(event.target.result);
       
-      // Extract ingredients from image using Claude
       setLoading(true);
       try {
         const response = await fetch('/.netlify/functions/anthropic', {
@@ -83,9 +82,8 @@ export default function RecipeGenerator() {
     setLoading(true);
     setRecipes([]);
 
-    // Core pantry items that are always assumed to be available
     const coreIngredients = ['salt', 'pepper', 'onion', 'cheese', 'garlic powder', 'onion powder'];
-    const allIngredients = [...new Set([...ingredients, ...coreIngredients])]; // Remove duplicates
+    const allIngredients = [...new Set([...ingredients, ...coreIngredients])];
 
     try {
       const response = await fetch('/.netlify/functions/anthropic', {
@@ -134,13 +132,13 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1a2332 0%, #2d3748 100%)',
-      fontFamily: "'Quicksand', 'Comic Neue', cursive",
-      padding: '20px',
+      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+      fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+      padding: '40px 20px',
       animation: 'fadeIn 0.6s ease-out'
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Fredoka:wght@600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -158,29 +156,9 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
           }
         }
         
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes cookingAnimation {
-          0%, 100% { 
-            transform: translateY(0) rotate(-5deg); 
-          }
-          25% { 
-            transform: translateY(-15px) rotate(5deg); 
-          }
-          50% { 
-            transform: translateY(0) rotate(-5deg); 
-          }
-          75% { 
-            transform: translateY(-10px) rotate(3deg); 
-          }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
         }
 
         .ingredient-chip {
@@ -193,8 +171,8 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
         }
 
         .recipe-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+          transform: translateY(-4px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
         .button {
@@ -203,115 +181,118 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
         }
 
         .button:hover {
-          transform: scale(1.05);
+          transform: translateY(-2px);
         }
 
         .button:active {
-          transform: scale(0.95);
-        }
-
-        .spinning {
-          animation: spin 1s linear infinite;
+          transform: translateY(0);
         }
       `}</style>
 
       <div style={{
-        maxWidth: '600px',
+        maxWidth: '800px',
         margin: '0 auto'
       }}>
         {/* Header */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '30px',
-          animation: 'slideUp 0.6s ease-out'
+          marginBottom: '50px',
+          animation: 'slideUp 0.6s ease-out',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          paddingBottom: '30px'
         }}>
           <div style={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            marginBottom: '10px'
+            justifyContent: 'center',
+            gap: '20px',
+            marginBottom: '15px'
           }}>
+            <div style={{
+              width: '50px',
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, #d4af37)',
+            }}></div>
             <h1 style={{
-              fontSize: '42px',
-              fontFamily: "'Fredoka', cursive",
-              color: '#fff',
+              fontSize: '48px',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: '300',
+              color: '#ffffff',
               margin: 0,
-              textShadow: '3px 3px 6px rgba(0,0,0,0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '15px'
+              letterSpacing: '8px',
+              textTransform: 'uppercase'
             }}>
-              Kitchen
-              <span style={{
-                fontSize: '48px',
-                display: 'inline-block',
-                animation: 'bounce 2s ease-in-out infinite'
-              }}>
-                🐱
-              </span>
-              Magic
+              CHEF
             </h1>
+            <div style={{
+              width: '50px',
+              height: '2px',
+              background: 'linear-gradient(90deg, #d4af37, transparent)',
+            }}></div>
           </div>
           <p style={{
-            color: 'rgba(255,255,255,0.9)',
-            fontSize: '16px',
-            margin: 0
+            color: 'rgba(255,255,255,0.6)',
+            fontSize: '14px',
+            margin: 0,
+            letterSpacing: '3px',
+            fontWeight: '300',
+            textTransform: 'uppercase'
           }}>
-            Scan or add ingredients to discover delicious recipes ✨
+            Executive Recipe Generator
           </p>
         </div>
 
         {/* Input Section */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '24px',
-          padding: '24px',
-          marginBottom: '24px',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-          animation: 'slideUp 0.6s ease-out 0.2s backwards'
+          background: 'rgba(26, 26, 26, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '8px',
+          padding: '40px',
+          marginBottom: '40px',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+          animation: 'slideUp 0.6s ease-out 0.2s backwards',
+          backdropFilter: 'blur(10px)'
         }}>
           <h2 style={{
-            fontSize: '22px',
+            fontSize: '14px',
             fontWeight: '600',
-            color: '#4a90e2',
+            color: '#d4af37',
             marginTop: 0,
-            marginBottom: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
+            marginBottom: '25px',
+            letterSpacing: '2px',
+            textTransform: 'uppercase'
           }}>
-            <UtensilsCrossed size={24} />
-            My Ingredients
+            Available Ingredients
           </h2>
 
-          {/* Camera and Input Buttons */}
           <div style={{
             display: 'flex',
             gap: '12px',
-            marginBottom: '16px'
+            marginBottom: '20px'
           }}>
             <button
               className="button"
               onClick={() => fileInputRef.current?.click()}
               style={{
                 flex: 1,
-                padding: '14px',
-                background: 'linear-gradient(135deg, #2c5282 0%, #2d3748 100%)',
-                border: 'none',
-                borderRadius: '16px',
-                color: 'white',
-                fontSize: '15px',
-                fontWeight: '600',
+                padding: '16px',
+                background: 'transparent',
+                border: '1px solid rgba(212, 175, 55, 0.5)',
+                borderRadius: '4px',
+                color: '#d4af37',
+                fontSize: '13px',
+                fontWeight: '500',
                 fontFamily: 'inherit',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 12px rgba(44, 82, 130, 0.4)'
+                gap: '10px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase'
               }}
             >
-              <Camera size={20} />
-              Scan Food
+              <Camera size={18} />
+              Scan Ingredients
             </button>
             <input
               ref={fileInputRef}
@@ -323,60 +304,57 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
             />
           </div>
 
-          {/* Manual Input */}
           <div style={{
             display: 'flex',
-            gap: '8px'
+            gap: '12px'
           }}>
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
-              placeholder="Type an ingredient..."
+              placeholder="Enter ingredient..."
               style={{
                 flex: 1,
-                padding: '12px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                fontSize: '15px',
+                padding: '14px 20px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '4px',
+                fontSize: '14px',
                 fontFamily: 'inherit',
                 outline: 'none',
+                background: 'rgba(0,0,0,0.3)',
+                color: '#ffffff',
                 transition: 'border-color 0.2s'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#2c5282'}
-              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              onFocus={(e) => e.target.style.borderColor = 'rgba(212, 175, 55, 0.5)'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
             />
             <button
               className="button"
               onClick={addIngredient}
               style={{
-                padding: '12px 20px',
-                background: '#48bb78',
+                padding: '14px 30px',
+                background: '#d4af37',
                 border: 'none',
-                borderRadius: '12px',
-                color: 'white',
-                fontSize: '15px',
+                borderRadius: '4px',
+                color: '#000000',
+                fontSize: '13px',
                 fontWeight: '600',
                 fontFamily: 'inherit',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 12px rgba(72, 187, 120, 0.4)'
+                letterSpacing: '1px',
+                textTransform: 'uppercase'
               }}
             >
-              <Plus size={18} />
               Add
             </button>
           </div>
 
-          {/* Ingredients List */}
           {ingredients.length > 0 && (
             <div style={{
-              marginTop: '16px',
+              marginTop: '25px',
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '8px'
+              gap: '10px'
             }}>
               {ingredients.map((ingredient, index) => (
                 <div
@@ -384,22 +362,23 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                   className="ingredient-chip"
                   style={{
                     animationDelay: `${index * 0.05}s`,
-                    background: 'linear-gradient(135deg, #ffd89b 0%, #fc9842 100%)',
-                    padding: '8px 14px',
-                    borderRadius: '20px',
+                    background: 'rgba(212, 175, 55, 0.1)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    padding: '10px 16px',
+                    borderRadius: '4px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    color: 'white',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    boxShadow: '0 2px 8px rgba(252, 152, 66, 0.3)'
+                    gap: '8px',
+                    color: '#d4af37',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px'
                   }}
                 >
                   {ingredient}
                   <X
-                    size={16}
-                    style={{ cursor: 'pointer' }}
+                    size={14}
+                    style={{ cursor: 'pointer', opacity: 0.7 }}
                     onClick={() => removeIngredient(index)}
                   />
                 </div>
@@ -407,7 +386,6 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
             </div>
           )}
 
-          {/* Generate Button */}
           {ingredients.length > 0 && (
             <button
               className="button"
@@ -415,59 +393,59 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
               disabled={loading}
               style={{
                 width: '100%',
-                marginTop: '16px',
-                padding: '16px',
-                background: loading ? '#cbd5e0' : 'linear-gradient(135deg, #2c5282 0%, #3182ce 100%)',
+                marginTop: '30px',
+                padding: '18px',
+                background: loading ? 'rgba(100,100,100,0.3)' : '#d4af37',
                 border: 'none',
-                borderRadius: '16px',
-                color: 'white',
-                fontSize: '17px',
-                fontWeight: '700',
+                borderRadius: '4px',
+                color: '#000000',
+                fontSize: '14px',
+                fontWeight: '600',
                 fontFamily: 'inherit',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                boxShadow: loading ? 'none' : '0 6px 16px rgba(44, 82, 130, 0.4)',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              <Sparkles size={20} className={loading ? 'spinning' : ''} />
-              {loading ? 'Generating Magic...' : 'Generate Recipes'}
+              {loading ? 'Processing...' : 'Generate Recipes'}
             </button>
           )}
         </div>
 
-        {/* Loading Animation - Cooking Cat */}
+        {/* Loading State */}
         {loading && (
           <div style={{
-            marginTop: '40px',
+            marginTop: '60px',
             textAlign: 'center',
             animation: 'slideUp 0.5s ease-out'
           }}>
             <div style={{
-              marginBottom: '20px'
+              marginBottom: '30px',
+              display: 'flex',
+              justifyContent: 'center'
             }}>
-              <img 
-                src="https://media.tenor.com/zWgPObq1HIEAAAAM/cat-cooking.gif"
-                alt="Chef cat cooking"
-                style={{
-                  width: '200px',
-                  height: '200px',
-                  borderRadius: '50%',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                  background: 'white',
-                  padding: '10px'
-                }}
-              />
+              <div style={{
+                width: '150px',
+                height: '150px',
+                borderRadius: '50%',
+                background: 'rgba(26, 26, 26, 0.8)',
+                border: '2px solid rgba(212, 175, 55, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '60px'
+              }}>
+                👨‍🍳
+              </div>
             </div>
             <p style={{
-              color: '#fff',
-              fontSize: '18px',
-              fontWeight: '600',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+              color: 'rgba(255,255,255,0.9)',
+              fontSize: '16px',
+              fontWeight: '300',
+              letterSpacing: '2px',
+              animation: 'pulse 2s ease-in-out infinite'
             }}>
-              Chef Whiskers is cooking up something special...
+              I'll be serving you shortly
             </p>
           </div>
         )}
@@ -475,23 +453,18 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
         {/* Recipes Display */}
         {recipes.length > 0 && (
           <div style={{
-            marginTop: '24px'
+            marginTop: '50px'
           }}>
             <h2 style={{
-              fontSize: '26px',
-              fontWeight: '700',
-              color: '#fff',
-              marginBottom: '16px',
-              textAlign: 'center',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px'
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#d4af37',
+              marginBottom: '30px',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              textAlign: 'center'
             }}>
-              <span style={{ fontSize: '32px' }}>🍽️</span>
-              Your Recipe Ideas
-              <span style={{ fontSize: '32px' }}>🍳</span>
+              Your Curated Recipes
             </h2>
             
             {recipes.map((recipe, index) => (
@@ -500,98 +473,99 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
                 className="recipe-card"
                 style={{
                   animationDelay: `${index * 0.15}s`,
-                  background: 'white',
-                  borderRadius: '20px',
-                  padding: '24px',
-                  marginBottom: '16px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                  position: 'relative'
+                  background: 'rgba(26, 26, 26, 0.6)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  padding: '35px',
+                  marginBottom: '25px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  backdropFilter: 'blur(10px)'
                 }}
               >
-                <div style={{
-                  position: 'absolute',
-                  top: '20px',
-                  right: '20px',
-                  fontSize: '40px',
-                  opacity: '0.3'
-                }}>
-                  🍴
-                </div>
-                
                 <h3 style={{
-                  fontSize: '22px',
-                  fontWeight: '700',
-                  color: '#2c5282',
+                  fontSize: '24px',
+                  fontWeight: '400',
+                  color: '#ffffff',
                   marginTop: 0,
-                  marginBottom: '8px'
+                  marginBottom: '12px',
+                  letterSpacing: '1px'
                 }}>
                   {recipe.name}
                 </h3>
                 
                 <p style={{
-                  color: '#4a5568',
-                  fontSize: '15px',
-                  lineHeight: '1.6',
-                  marginBottom: '12px'
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '14px',
+                  lineHeight: '1.8',
+                  marginBottom: '20px',
+                  fontWeight: '300'
                 }}>
                   {recipe.description}
                 </p>
 
                 <div style={{
                   display: 'flex',
-                  gap: '12px',
-                  marginBottom: '12px',
+                  gap: '15px',
+                  marginBottom: '25px',
                   flexWrap: 'wrap'
                 }}>
                   <span style={{
-                    background: '#e6fffa',
-                    color: '#319795',
-                    padding: '4px 12px',
-                    borderRadius: '12px',
-                    fontSize: '13px',
-                    fontWeight: '600'
+                    background: 'rgba(212, 175, 55, 0.1)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    color: '#d4af37',
+                    padding: '6px 14px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px'
                   }}>
-                    ⏱️ {recipe.time}
+                    {recipe.time}
                   </span>
                   <span style={{
-                    background: '#fef5e7',
-                    color: '#d69e2e',
-                    padding: '4px 12px',
-                    borderRadius: '12px',
-                    fontSize: '13px',
-                    fontWeight: '600'
+                    background: 'rgba(212, 175, 55, 0.1)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    color: '#d4af37',
+                    padding: '6px 14px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    letterSpacing: '0.5px',
+                    textTransform: 'capitalize'
                   }}>
-                    📊 {recipe.difficulty}
+                    {recipe.difficulty}
                   </span>
                 </div>
 
                 <div style={{
-                  borderTop: '2px dashed #e2e8f0',
-                  paddingTop: '12px',
-                  marginTop: '12px'
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                  paddingTop: '20px',
+                  marginTop: '20px'
                 }}>
                   <p style={{
-                    fontSize: '13px',
+                    fontSize: '12px',
                     fontWeight: '600',
-                    color: '#718096',
-                    marginBottom: '6px'
+                    color: '#d4af37',
+                    marginBottom: '12px',
+                    letterSpacing: '1px',
+                    textTransform: 'uppercase'
                   }}>
-                    Using:
+                    Ingredients
                   </p>
                   <div style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '6px'
+                    gap: '8px'
                   }}>
                     {recipe.ingredients.map((ing, i) => (
                       <span
                         key={i}
                         style={{
-                          background: '#edf2f7',
-                          color: '#4a5568',
-                          padding: '4px 10px',
-                          borderRadius: '8px',
-                          fontSize: '13px'
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          color: 'rgba(255,255,255,0.7)',
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                          fontWeight: '300'
                         }}
                       >
                         {ing}
@@ -602,33 +576,33 @@ Include clear step-by-step cooking instructions. Make recipes that feel like hom
 
                 {recipe.instructions && recipe.instructions.length > 0 && (
                   <div style={{
-                    borderTop: '2px dashed #e2e8f0',
-                    paddingTop: '12px',
-                    marginTop: '12px'
+                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                    paddingTop: '20px',
+                    marginTop: '20px'
                   }}>
                     <p style={{
-                      fontSize: '14px',
-                      fontWeight: '700',
-                      color: '#2c5282',
-                      marginBottom: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#d4af37',
+                      marginBottom: '15px',
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase'
                     }}>
-                      👨‍🍳 Cooking Instructions:
+                      Preparation
                     </p>
                     <ol style={{
                       margin: '0',
                       paddingLeft: '20px',
-                      color: '#4a5568'
+                      color: 'rgba(255,255,255,0.7)',
+                      lineHeight: '1.8'
                     }}>
                       {recipe.instructions.map((instruction, i) => (
                         <li
                           key={i}
                           style={{
                             fontSize: '14px',
-                            lineHeight: '1.6',
-                            marginBottom: '8px'
+                            marginBottom: '12px',
+                            fontWeight: '300'
                           }}
                         >
                           {instruction}
