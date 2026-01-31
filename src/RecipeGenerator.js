@@ -821,7 +821,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
               onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-3px)')}
               onMouseOut={(e) => !loading && (e.target.style.transform = 'translateY(0)')}
             >
-              {loading ? 'Processing...' : '✨ Let's Cook ✨'}
+              {loading ? 'Processing...' : "✨ Let's Cook ✨"}
             </button>
           )}
         </div>
