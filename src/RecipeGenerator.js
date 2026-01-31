@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight, Lightbulb, Download } from 'lucide-react';
+import { Camera, Plus, X, Sparkles, UtensilsCrossed, ChevronRight, Lightbulb, Download, Clock, TrendingUp } from 'lucide-react';
 
 export default function RecipeGenerator() {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -29,6 +29,41 @@ export default function RecipeGenerator() {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
+  // Food category icons mapping
+  const foodIcons = {
+    'rice': '🍚',
+    'tomato': '🥫',
+    'egg': '🥚',
+    'chicken': '🍗',
+    'broccoli': '🥦',
+    'pepper': '🌶️',
+    'pasta': '🍝',
+    'bread': '🍞',
+    'cheese': '🧀',
+    'milk': '🥛',
+    'beef': '🥩',
+    'pork': '🥓',
+    'fish': '🐟',
+    'shrimp': '🍤',
+    'potato': '🥔',
+    'carrot': '🥕',
+    'onion': '🧅',
+    'garlic': '🧄',
+    'lettuce': '🥬',
+    'mushroom': '🍄',
+    'corn': '🌽',
+    'bean': '🫘',
+    'default': '🥘'
+  };
+
+  const getIngredientIcon = (ingredient) => {
+    const lower = ingredient.toLowerCase();
+    for (const [key, icon] of Object.entries(foodIcons)) {
+      if (lower.includes(key)) return icon;
+    }
+    return foodIcons.default;
+  };
+
   // PWA Install Prompt Handler
   useEffect(() => {
     const handler = (e) => {
@@ -39,7 +74,6 @@ export default function RecipeGenerator() {
     
     window.addEventListener('beforeinstallprompt', handler);
     
-    // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setShowInstallPrompt(false);
     }
@@ -155,6 +189,7 @@ Suggest ${recipeCount} diverse recipes ranging from simple everyday meals to cre
 For each recipe, include:
 1. Recipes using ONLY my current ingredients
 2. Creative variations that might need 1-2 additional ingredients (mark these clearly as "optional additions")
+3. A food image search term (simple 2-3 word description for finding images)
 
 CRITICAL: You MUST return ONLY valid JSON. No markdown, no backticks, no explanation text.
 
@@ -168,6 +203,7 @@ Return ONLY a JSON array with this exact format:
     "difficulty": "easy/medium/hard",
     "creativityLevel": "simple/creative/gourmet",
     "optionalAdditions": ["optional ingredient 1", "optional ingredient 2"],
+    "imageSearchTerm": "fried rice chicken",
     "instructions": ["Step 1 instruction", "Step 2 instruction", "Step 3 instruction"]
   }
 ]
@@ -179,13 +215,9 @@ Be diverse in your suggestions - include both practical everyday meals and more 
 
       const data = await response.json();
       
-      // Get the text response
       let text = data.content[0].text.trim();
-      
-      // Remove markdown code blocks if present
       text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
       
-      // Remove any text before the first [ or after the last ]
       const firstBracket = text.indexOf('[');
       const lastBracket = text.lastIndexOf(']');
       
@@ -195,15 +227,12 @@ Be diverse in your suggestions - include both practical everyday meals and more 
       
       text = text.substring(firstBracket, lastBracket + 1);
       
-      // Try to parse the JSON
       let generatedRecipes;
       try {
         generatedRecipes = JSON.parse(text);
       } catch (parseError) {
         console.error('JSON Parse Error:', parseError);
         console.error('Attempted to parse:', text);
-        
-        // Show a more helpful error message
         throw new Error('Could not parse recipe JSON. Please try again with different ingredients or fewer recipes.');
       }
       
@@ -211,7 +240,13 @@ Be diverse in your suggestions - include both practical everyday meals and more 
         throw new Error('No recipes were generated. Please try again.');
       }
       
-      setRecipes(generatedRecipes);
+      // Add Unsplash images to recipes
+      const recipesWithImages = generatedRecipes.map(recipe => ({
+        ...recipe,
+        imageUrl: `https://source.unsplash.com/400x400/?${encodeURIComponent(recipe.imageSearchTerm || recipe.name)}`
+      }));
+      
+      setRecipes(recipesWithImages);
     } catch (error) {
       console.error('Error generating recipes:', error);
       alert(`Could not generate recipes: ${error.message}\n\nTry using fewer ingredients or reducing the number of recipes.`);
@@ -225,13 +260,14 @@ Be diverse in your suggestions - include both practical everyday meals and more 
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+        background: 'linear-gradient(135deg, #0f0f0f 0%, #1e1e1e 100%)',
         fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
         padding: '40px 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        animation: 'fadeIn 0.6s ease-out'
+        animation: 'fadeIn 0.6s ease-out',
+        position: 'relative'
       }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -263,6 +299,23 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             }
           }
 
+          @keyframes glow {
+            from {
+              text-shadow: 
+                0 0 10px rgba(212, 175, 55, 0.8),
+                0 0 20px rgba(212, 175, 55, 0.6),
+                0 0 30px rgba(212, 175, 55, 0.4),
+                0 0 40px rgba(212, 175, 55, 0.2);
+            }
+            to {
+              text-shadow: 
+                0 0 15px rgba(212, 175, 55, 1),
+                0 0 30px rgba(212, 175, 55, 0.8),
+                0 0 45px rgba(212, 175, 55, 0.6),
+                0 0 60px rgba(212, 175, 55, 0.4);
+            }
+          }
+
           .terms-content {
             max-height: 300px;
             overflow-y: auto;
@@ -284,7 +337,21 @@ Be diverse in your suggestions - include both practical everyday meals and more 
           }
         `}</style>
 
-        {/* Install App Prompt - Welcome Screen */}
+        {/* Background effect */}
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none',
+          zIndex: 0
+        }}></div>
+
         {showInstallPrompt && (
           <div style={{
             position: 'fixed',
@@ -324,9 +391,10 @@ Be diverse in your suggestions - include both practical everyday meals and more 
         <div style={{
           maxWidth: '700px',
           width: '100%',
-          animation: 'slideUp 0.6s ease-out'
+          animation: 'slideUp 0.6s ease-out',
+          position: 'relative',
+          zIndex: 1
         }}>
-          {/* Logo/Title */}
           <div style={{
             textAlign: 'center',
             marginBottom: '50px'
@@ -340,39 +408,44 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             }}>
               <div style={{
                 width: '60px',
-                height: '2px',
-                background: 'linear-gradient(90deg, transparent, #d4af37)',
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6))',
               }}></div>
               <h1 style={{
                 fontSize: '56px',
                 fontWeight: '300',
-                color: '#ffffff',
+                color: '#d4af37',
                 margin: 0,
                 letterSpacing: '10px',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                textShadow: `
+                  0 0 10px rgba(212, 175, 55, 0.8),
+                  0 0 20px rgba(212, 175, 55, 0.6),
+                  0 0 30px rgba(212, 175, 55, 0.4),
+                  0 0 40px rgba(212, 175, 55, 0.2)
+                `,
+                animation: 'glow 2s ease-in-out infinite alternate'
               }}>
                 CHEF
               </h1>
               <div style={{
                 width: '60px',
-                height: '2px',
-                background: 'linear-gradient(90deg, #d4af37, transparent)',
+                height: '1px',
+                background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.6), transparent)',
               }}></div>
             </div>
             <p style={{
-              color: '#d4af37',
-              fontSize: '14px',
+              color: 'rgba(212, 175, 55, 0.8)',
+              fontSize: '13px',
               margin: 0,
               letterSpacing: '3px',
-              fontWeight: '300',
-              textTransform: 'uppercase',
+              fontWeight: '400',
               animation: 'fadeInText 1s ease-out 0.5s backwards'
             }}>
-              Welcome Chef
+              Your Personal Culinary Assistant
             </p>
           </div>
 
-          {/* Welcome Card */}
           <div style={{
             background: 'rgba(26, 26, 26, 0.8)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -548,7 +621,6 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             </button>
           </div>
 
-          {/* Footer */}
           <div style={{
             marginTop: '30px',
             textAlign: 'left',
@@ -573,7 +645,7 @@ Be diverse in your suggestions - include both practical everyday meals and more 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+      background: 'linear-gradient(135deg, #0f0f0f 0%, #1e1e1e 100%)',
       fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
       padding: '40px 20px',
       animation: 'fadeIn 0.6s ease-out',
@@ -608,10 +680,32 @@ Be diverse in your suggestions - include both practical everyday meals and more 
             transform: translateY(0);
           }
         }
+
+        @keyframes glow {
+          from {
+            text-shadow: 
+              0 0 10px rgba(212, 175, 55, 0.8),
+              0 0 20px rgba(212, 175, 55, 0.6),
+              0 0 30px rgba(212, 175, 55, 0.4),
+              0 0 40px rgba(212, 175, 55, 0.2);
+          }
+          to {
+            text-shadow: 
+              0 0 15px rgba(212, 175, 55, 1),
+              0 0 30px rgba(212, 175, 55, 0.8),
+              0 0 45px rgba(212, 175, 55, 0.6),
+              0 0 60px rgba(212, 175, 55, 0.4);
+          }
+        }
         
         @keyframes pulse {
           0%, 100% { opacity: 0.6; }
           50% { opacity: 1; }
+        }
+
+        @keyframes sparkle {
+          0%, 100% { transform: rotate(0deg) scale(1); }
+          50% { transform: rotate(180deg) scale(1.2); }
         }
 
         .ingredient-chip {
@@ -642,7 +736,21 @@ Be diverse in your suggestions - include both practical everyday meals and more 
         }
       `}</style>
 
-      {/* Install App Prompt - Main App */}
+      {/* Background effect */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%)
+        `,
+        pointerEvents: 'none',
+        zIndex: 0
+      }}></div>
+
       {showInstallPrompt && (
         <div style={{
           position: 'fixed',
@@ -681,14 +789,16 @@ Be diverse in your suggestions - include both practical everyday meals and more 
 
       <div style={{
         maxWidth: '900px',
-        margin: '0 auto'
+        margin: '0 auto',
+        position: 'relative',
+        zIndex: 1
       }}>
-        {/* Header */}
+        {/* Header with Illuminated CHEF */}
         <div style={{
           textAlign: 'center',
           marginBottom: '50px',
           animation: 'slideUp 0.6s ease-out',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
           paddingBottom: '30px'
         }}>
           <div style={{
@@ -700,66 +810,89 @@ Be diverse in your suggestions - include both practical everyday meals and more 
           }}>
             <div style={{
               width: '50px',
-              height: '2px',
-              background: 'linear-gradient(90deg, transparent, #d4af37)',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6))',
             }}></div>
             <h1 style={{
               fontSize: '48px',
               fontFamily: "'Inter', sans-serif",
               fontWeight: '300',
-              color: '#ffffff',
+              color: '#d4af37',
               margin: 0,
               letterSpacing: '8px',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              textShadow: `
+                0 0 10px rgba(212, 175, 55, 0.8),
+                0 0 20px rgba(212, 175, 55, 0.6),
+                0 0 30px rgba(212, 175, 55, 0.4),
+                0 0 40px rgba(212, 175, 55, 0.2)
+              `,
+              animation: 'glow 2s ease-in-out infinite alternate'
             }}>
               CHEF
             </h1>
             <div style={{
               width: '50px',
-              height: '2px',
-              background: 'linear-gradient(90deg, #d4af37, transparent)',
+              height: '1px',
+              background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.6), transparent)',
             }}></div>
           </div>
           <p style={{
-            color: '#d4af37',
-            fontSize: '14px',
+            color: 'rgba(212, 175, 55, 0.8)',
+            fontSize: '13px',
             margin: 0,
             letterSpacing: '3px',
-            fontWeight: '300',
-            textTransform: 'uppercase',
+            fontWeight: '400',
             animation: 'fadeInText 1s ease-out 0.5s backwards'
           }}>
-            Welcome Chef
+            Your Personal Culinary Assistant
           </p>
         </div>
 
         {/* Input Section */}
         <div style={{
-          background: 'rgba(26, 26, 26, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '8px',
+          background: 'rgba(26, 26, 26, 0.7)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '16px',
           padding: '40px',
           marginBottom: '40px',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
           animation: 'slideUp 0.6s ease-out 0.2s backwards',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'blur(20px)'
         }}>
-          <h2 style={{
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#d4af37',
-            marginTop: 0,
-            marginBottom: '25px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase'
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px'
           }}>
-            Available Ingredients
-          </h2>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              background: 'rgba(212, 175, 55, 0.15)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '18px'
+            }}>
+              🥘
+            </div>
+            <h2 style={{
+              fontSize: '15px',
+              fontWeight: '600',
+              color: 'rgba(255,255,255,0.9)',
+              margin: 0,
+              letterSpacing: '1px'
+            }}>
+              Available Ingredients
+            </h2>
+          </div>
 
           <div style={{
             display: 'flex',
             gap: '12px',
-            marginBottom: '20px'
+            marginBottom: '24px'
           }}>
             <button
               className="button"
@@ -767,23 +900,23 @@ Be diverse in your suggestions - include both practical everyday meals and more 
               style={{
                 flex: 1,
                 padding: '16px',
-                background: 'transparent',
-                border: '1px solid rgba(212, 175, 55, 0.5)',
-                borderRadius: '4px',
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05))',
+                border: '1px solid rgba(212, 175, 55, 0.3)',
+                borderRadius: '12px',
                 color: '#d4af37',
-                fontSize: '13px',
+                fontSize: '14px',
                 fontWeight: '500',
                 fontFamily: 'inherit',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '10px',
-                letterSpacing: '1px',
-                textTransform: 'uppercase'
+                letterSpacing: '0.5px',
+                cursor: 'pointer'
               }}
             >
               <Camera size={18} />
-              Scan Ingredients
+              📷 Scan Ingredients
             </button>
             <input
               ref={fileInputRef}
@@ -797,7 +930,8 @@ Be diverse in your suggestions - include both practical everyday meals and more 
 
           <div style={{
             display: 'flex',
-            gap: '12px'
+            gap: '12px',
+            marginBottom: '24px'
           }}>
             <input
               type="text"
@@ -807,33 +941,41 @@ Be diverse in your suggestions - include both practical everyday meals and more 
               placeholder="Enter ingredient..."
               style={{
                 flex: 1,
-                padding: '14px 20px',
+                padding: '16px 20px',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '4px',
-                fontSize: '14px',
+                borderRadius: '12px',
+                fontSize: '15px',
                 fontFamily: 'inherit',
                 outline: 'none',
-                background: 'rgba(0,0,0,0.3)',
+                background: 'rgba(0,0,0,0.4)',
                 color: '#ffffff',
-                transition: 'border-color 0.2s'
+                transition: 'all 0.3s ease'
               }}
-              onFocus={(e) => e.target.style.borderColor = 'rgba(212, 175, 55, 0.5)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'rgba(212, 175, 55, 0.5)';
+                e.target.style.background = 'rgba(0,0,0,0.6)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(212, 175, 55, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                e.target.style.background = 'rgba(0,0,0,0.4)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
             <button
               className="button"
               onClick={addIngredient}
               style={{
-                padding: '14px 30px',
-                background: '#d4af37',
+                padding: '16px 32px',
+                background: 'linear-gradient(135deg, #d4af37, #b8941f)',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '12px',
                 color: '#000000',
-                fontSize: '13px',
+                fontSize: '14px',
                 fontWeight: '600',
                 fontFamily: 'inherit',
-                letterSpacing: '1px',
-                textTransform: 'uppercase'
+                letterSpacing: '0.5px',
+                boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
               }}
             >
               Add
@@ -842,10 +984,10 @@ Be diverse in your suggestions - include both practical everyday meals and more 
 
           {ingredients.length > 0 && (
             <div style={{
-              marginTop: '25px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+              gap: '10px',
+              marginBottom: '30px'
             }}>
               {ingredients.map((ingredient, index) => (
                 <div
@@ -853,50 +995,72 @@ Be diverse in your suggestions - include both practical everyday meals and more 
                   className="ingredient-chip"
                   style={{
                     animationDelay: `${index * 0.05}s`,
-                    background: 'rgba(212, 175, 55, 0.1)',
-                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                    padding: '10px 16px',
-                    borderRadius: '4px',
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05))',
+                    border: '1px solid rgba(212, 175, 55, 0.25)',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     gap: '8px',
-                    color: '#d4af37',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    letterSpacing: '0.5px'
+                    cursor: 'pointer'
                   }}
                 >
-                  {ingredient}
+                  <span style={{ fontSize: '16px' }}>{getIngredientIcon(ingredient)}</span>
+                  <span style={{
+                    color: 'rgba(255,255,255,0.85)',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    flex: 1
+                  }}>
+                    {ingredient}
+                  </span>
                   <X
                     size={14}
-                    style={{ cursor: 'pointer', opacity: 0.7 }}
+                    style={{ 
+                      cursor: 'pointer', 
+                      color: 'rgba(255,255,255,0.4)',
+                      transition: 'color 0.2s'
+                    }}
                     onClick={() => removeIngredient(index)}
+                    onMouseOver={(e) => e.target.style.color = '#ff6b6b'}
+                    onMouseOut={(e) => e.target.style.color = 'rgba(255,255,255,0.4)'}
                   />
                 </div>
               ))}
             </div>
           )}
 
-          {/* Recipe Count Selector */}
           {ingredients.length > 0 && (
             <div style={{
-              marginTop: '25px',
-              padding: '20px',
               background: 'rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '6px'
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '12px',
+              padding: '24px',
+              marginBottom: '30px'
             }}>
-              <label style={{
-                display: 'block',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#d4af37',
-                marginBottom: '12px',
-                letterSpacing: '1px',
-                textTransform: 'uppercase'
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px'
               }}>
-                Number of Recipes: {recipeCount}
-              </label>
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: 'rgba(255,255,255,0.7)',
+                  letterSpacing: '0.5px'
+                }}>
+                  Number of Recipes
+                </span>
+                <span style={{
+                  fontSize: '24px',
+                  fontWeight: '600',
+                  color: '#d4af37'
+                }}>
+                  {recipeCount}
+                </span>
+              </div>
               <input
                 type="range"
                 min="3"
@@ -905,6 +1069,11 @@ Be diverse in your suggestions - include both practical everyday meals and more 
                 onChange={(e) => setRecipeCount(parseInt(e.target.value))}
                 style={{
                   width: '100%',
+                  height: '6px',
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '3px',
+                  outline: 'none',
+                  WebkitAppearance: 'none',
                   accentColor: '#d4af37'
                 }}
               />
@@ -926,21 +1095,32 @@ Be diverse in your suggestions - include both practical everyday meals and more 
               disabled={loading}
               style={{
                 width: '100%',
-                marginTop: '30px',
-                padding: '18px',
-                background: loading ? 'rgba(100,100,100,0.3)' : '#d4af37',
+                padding: '20px',
+                background: loading ? 'rgba(100,100,100,0.3)' : 'linear-gradient(135deg, #d4af37, #b8941f)',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '12px',
                 color: '#000000',
-                fontSize: '14px',
-                fontWeight: '600',
+                fontSize: '15px',
+                fontWeight: '700',
                 fontFamily: 'inherit',
                 letterSpacing: '2px',
                 textTransform: 'uppercase',
-                cursor: loading ? 'not-allowed' : 'pointer'
+                cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: loading ? 'none' : '0 8px 25px rgba(212, 175, 55, 0.4)',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
-              {loading ? 'Processing...' : 'Generate Recipes'}
+              {loading ? 'Processing...' : (
+                <>
+                  Generate Recipes
+                  <span style={{
+                    display: 'inline-block',
+                    marginLeft: '8px',
+                    animation: 'sparkle 1.5s ease-in-out infinite'
+                  }}>✨</span>
+                </>
+              )}
             </button>
           )}
         </div>
@@ -982,22 +1162,32 @@ Be diverse in your suggestions - include both practical everyday meals and more 
           </div>
         )}
 
-        {/* Recipes Display */}
+        {/* Recipes Display with Photos */}
         {recipes.length > 0 && (
           <div style={{
-            marginTop: '50px'
+            marginTop: '50px',
+            paddingTop: '40px',
+            borderTop: '1px solid rgba(255,255,255,0.08)'
           }}>
-            <h2 style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#d4af37',
-              marginBottom: '30px',
-              letterSpacing: '2px',
-              textTransform: 'uppercase',
-              textAlign: 'center'
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '30px'
             }}>
-              Your Curated Recipes ({recipes.length})
-            </h2>
+              <h2 style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#d4af37',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                margin: 0,
+                textShadow: `
+                  0 0 10px rgba(212, 175, 55, 0.6),
+                  0 0 20px rgba(212, 175, 55, 0.4)
+                `
+              }}>
+                Your Curated Recipes ({recipes.length})
+              </h2>
+            </div>
             
             {recipes.map((recipe, index) => (
               <div
@@ -1006,228 +1196,116 @@ Be diverse in your suggestions - include both practical everyday meals and more 
                 style={{
                   animationDelay: `${index * 0.1}s`,
                   background: 'rgba(26, 26, 26, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '8px',
-                  padding: '35px',
-                  marginBottom: '25px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  marginBottom: '20px',
+                  overflow: 'hidden',
+                  display: 'grid',
+                  gridTemplateColumns: window.innerWidth > 768 ? '200px 1fr' : '1fr',
                   boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
                   backdropFilter: 'blur(10px)'
                 }}
               >
+                <img 
+                  src={recipe.imageUrl}
+                  alt={recipe.name}
+                  style={{
+                    width: window.innerWidth > 768 ? '200px' : '100%',
+                    height: window.innerWidth > 768 ? '200px' : '180px',
+                    objectFit: 'cover'
+                  }}
+                />
                 <div style={{
+                  padding: '30px',
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '12px'
+                  flexDirection: 'column',
+                  justifyContent: 'center'
                 }}>
-                  <h3 style={{
-                    fontSize: '24px',
-                    fontWeight: '400',
-                    color: '#ffffff',
-                    margin: 0,
-                    letterSpacing: '1px',
-                    flex: 1
-                  }}>
-                    {recipe.name}
-                  </h3>
-                  {recipe.creativityLevel && (
-                    <span style={{
-                      fontSize: '11px',
-                      padding: '4px 10px',
-                      borderRadius: '4px',
-                      background: recipe.creativityLevel === 'gourmet' ? 'rgba(212, 175, 55, 0.2)' : 
-                                  recipe.creativityLevel === 'creative' ? 'rgba(100, 150, 255, 0.2)' : 
-                                  'rgba(100, 255, 150, 0.2)',
-                      color: recipe.creativityLevel === 'gourmet' ? '#d4af37' : 
-                             recipe.creativityLevel === 'creative' ? '#6496ff' : 
-                             '#64ff96',
-                      border: `1px solid ${recipe.creativityLevel === 'gourmet' ? 'rgba(212, 175, 55, 0.4)' : 
-                                          recipe.creativityLevel === 'creative' ? 'rgba(100, 150, 255, 0.4)' : 
-                                          'rgba(100, 255, 150, 0.4)'}`,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      fontWeight: '600'
-                    }}>
-                      {recipe.creativityLevel === 'gourmet' ? '✨ Gourmet' : 
-                       recipe.creativityLevel === 'creative' ? '💡 Creative' : 
-                       '🍽️ Simple'}
-                    </span>
-                  )}
-                </div>
-                
-                <p style={{
-                  color: 'rgba(255,255,255,0.6)',
-                  fontSize: '14px',
-                  lineHeight: '1.8',
-                  marginBottom: '20px',
-                  fontWeight: '300'
-                }}>
-                  {recipe.description}
-                </p>
-
-                <div style={{
-                  display: 'flex',
-                  gap: '15px',
-                  marginBottom: '25px',
-                  flexWrap: 'wrap'
-                }}>
-                  <span style={{
-                    background: 'rgba(212, 175, 55, 0.1)',
-                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                    color: '#d4af37',
-                    padding: '6px 14px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    letterSpacing: '0.5px'
-                  }}>
-                    {recipe.time}
-                  </span>
-                  <span style={{
-                    background: 'rgba(212, 175, 55, 0.1)',
-                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                    color: '#d4af37',
-                    padding: '6px 14px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    letterSpacing: '0.5px',
-                    textTransform: 'capitalize'
-                  }}>
-                    {recipe.difficulty}
-                  </span>
-                </div>
-
-                <div style={{
-                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                  paddingTop: '20px',
-                  marginTop: '20px'
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#d4af37',
-                    marginBottom: '12px',
-                    letterSpacing: '1px',
-                    textTransform: 'uppercase'
-                  }}>
-                    Ingredients
-                  </p>
                   <div style={{
                     display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '8px'
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '8px'
                   }}>
-                    {recipe.ingredients.map((ing, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          color: 'rgba(255,255,255,0.7)',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          fontSize: '13px',
-                          fontWeight: '300'
-                        }}
-                      >
-                        {ing}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {recipe.optionalAdditions && recipe.optionalAdditions.length > 0 && (
-                  <div style={{
-                    borderTop: '1px solid rgba(100, 150, 255, 0.2)',
-                    paddingTop: '20px',
-                    marginTop: '20px',
-                    background: 'rgba(100, 150, 255, 0.05)',
-                    padding: '20px',
-                    borderRadius: '6px'
-                  }}>
-                    <p style={{
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#6496ff',
-                      marginBottom: '12px',
+                    <h3 style={{
+                      fontSize: '22px',
+                      fontWeight: '500',
+                      color: '#ffffff',
+                      margin: 0,
                       letterSpacing: '1px',
-                      textTransform: 'uppercase',
+                      flex: 1
+                    }}>
+                      {recipe.name}
+                    </h3>
+                    {recipe.creativityLevel && (
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        fontWeight: '600',
+                        letterSpacing: '0.5px',
+                        textTransform: 'uppercase',
+                        background: recipe.creativityLevel === 'gourmet' ? 'rgba(212, 175, 55, 0.2)' : 
+                                    recipe.creativityLevel === 'creative' ? 'rgba(100, 150, 255, 0.2)' : 
+                                    'rgba(100, 255, 150, 0.2)',
+                        color: recipe.creativityLevel === 'gourmet' ? '#d4af37' : 
+                               recipe.creativityLevel === 'creative' ? '#6496ff' : 
+                               '#64ff96',
+                        border: `1px solid ${recipe.creativityLevel === 'gourmet' ? 'rgba(212, 175, 55, 0.4)' : 
+                                            recipe.creativityLevel === 'creative' ? 'rgba(100, 150, 255, 0.4)' : 
+                                            'rgba(100, 255, 150, 0.4)'}`
+                      }}>
+                        {recipe.creativityLevel === 'gourmet' ? '✨ Gourmet' : 
+                         recipe.creativityLevel === 'creative' ? '💡 Creative' : 
+                         '🍽️ Simple'}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p style={{
+                    color: 'rgba(255,255,255,0.6)',
+                    fontSize: '14px',
+                    lineHeight: '1.6',
+                    marginBottom: '12px'
+                  }}>
+                    {recipe.description}
+                  </p>
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '16px',
+                    marginTop: '8px'
+                  }}>
+                    <span style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px'
-                    }}>
-                      <Lightbulb size={14} />
-                      Optional Additions (Enhance This Dish)
-                    </p>
-                    <div style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '8px'
-                    }}>
-                      {recipe.optionalAdditions.map((ing, i) => (
-                        <span
-                          key={i}
-                          style={{
-                            background: 'rgba(100, 150, 255, 0.1)',
-                            border: '1px solid rgba(100, 150, 255, 0.3)',
-                            color: '#6496ff',
-                            padding: '6px 12px',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: '400'
-                          }}
-                        >
-                          + {ing}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {recipe.instructions && recipe.instructions.length > 0 && (
-                  <div style={{
-                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                    paddingTop: '20px',
-                    marginTop: '20px'
-                  }}>
-                    <p style={{
+                      gap: '6px',
                       fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#d4af37',
-                      marginBottom: '15px',
-                      letterSpacing: '1px',
-                      textTransform: 'uppercase'
+                      color: 'rgba(255,255,255,0.5)'
                     }}>
-                      Preparation
-                    </p>
-                    <ol style={{
-                      margin: '0',
-                      paddingLeft: '20px',
-                      color: 'rgba(255,255,255,0.7)',
-                      lineHeight: '1.8'
+                      <Clock size={14} style={{ color: '#d4af37' }} />
+                      {recipe.time}
+                    </span>
+                    <span style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '12px',
+                      color: 'rgba(255,255,255,0.5)',
+                      textTransform: 'capitalize'
                     }}>
-                      {recipe.instructions.map((instruction, i) => (
-                        <li
-                          key={i}
-                          style={{
-                            fontSize: '14px',
-                            marginBottom: '12px',
-                            fontWeight: '300'
-                          }}
-                        >
-                          {instruction}
-                        </li>
-                      ))}
-                    </ol>
+                      <TrendingUp size={14} style={{ color: '#d4af37' }} />
+                      {recipe.difficulty}
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Footer - Always visible on main app */}
+      {/* Footer */}
       <div style={{
         position: 'fixed',
         bottom: '20px',
