@@ -193,29 +193,35 @@ Suggest 3-4 simple to moderate difficulty recipes (NO fancy restaurant-style dis
 
 For each recipe, provide:
 1. Name
-2. Brief description
+2. Brief description (keep it simple, avoid apostrophes and special characters)
 3. Full list of ingredients needed
 4. Cooking time
 5. Difficulty level (easy or medium only)
 6. Number of servings
-7. Step-by-step instructions (5-7 steps)
+7. Step-by-step instructions (5-7 steps, keep each step clear and simple)
 
-CRITICAL: You MUST return ONLY valid JSON. No markdown, no backticks, no explanation text.
+CRITICAL JSON REQUIREMENTS:
+- Return ONLY a valid JSON array
+- NO markdown, NO backticks, NO explanation text before or after
+- Use double quotes for all strings
+- Escape any quotes inside strings with backslash
+- No trailing commas
+- Ensure all brackets and braces are properly closed
 
 Return ONLY a JSON array with this exact format:
 [
   {
     "name": "Recipe Name",
-    "description": "Brief description",
+    "description": "Brief description without special characters",
     "ingredients": ["ingredient1", "ingredient2"],
     "time": "15 mins",
     "difficulty": "easy",
     "servings": "Serves 4",
-    "instructions": ["Step 1 instruction", "Step 2 instruction", "Step 3 instruction"]
+    "instructions": ["Step 1", "Step 2", "Step 3"]
   }
 ]
 
-Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return ONLY the JSON array, nothing else.`
+Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return ONLY the JSON array with no other text.`
           }]
         })
       });
@@ -223,16 +229,23 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
       const data = await response.json();
       
       let text = data.content[0].text.trim();
+      
+      // Remove markdown code blocks
       text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
       
+      // Extract JSON array
       const firstBracket = text.indexOf('[');
       const lastBracket = text.lastIndexOf(']');
       
       if (firstBracket === -1 || lastBracket === -1) {
-        throw new Error('Invalid JSON response - no array found');
+        throw new Error('Invalid JSON response - no array found. Please try again.');
       }
       
       text = text.substring(firstBracket, lastBracket + 1);
+      
+      // Clean up common JSON issues
+      text = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Remove control characters
+      text = text.replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
       
       let generatedRecipes;
       try {
@@ -240,7 +253,25 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
       } catch (parseError) {
         console.error('JSON Parse Error:', parseError);
         console.error('Attempted to parse:', text);
-        throw new Error('Could not parse recipe JSON. Please try again with different ingredients.');
+        
+        // Try one more time with aggressive cleaning
+        try {
+          // Fix unescaped quotes in strings (basic attempt)
+          const fixedText = text.replace(/(?<!\\)"/g, (match, offset) => {
+            // This is a simple heuristic - not perfect but helps
+            const before = text.substring(Math.max(0, offset - 20), offset);
+            const after = text.substring(offset + 1, Math.min(text.length, offset + 20));
+            
+            // If it looks like it's inside a string value, escape it
+            if (before.includes('": "') && !after.includes('",')) {
+              return '\\"';
+            }
+            return match;
+          });
+          generatedRecipes = JSON.parse(fixedText);
+        } catch (secondError) {
+          throw new Error('Could not parse recipe JSON. Please try with fewer or different ingredients.');
+        }
       }
       
       if (!Array.isArray(generatedRecipes) || generatedRecipes.length === 0) {
