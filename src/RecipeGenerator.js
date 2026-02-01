@@ -303,7 +303,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
         position: 'relative'
       }}>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&family=Eagle+Lake&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Quando&family=Eagle+Lake&family=Open+Sans:wght@400;500;600&display=swap');
           
           @keyframes fadeIn {
             from { opacity: 0; }
@@ -587,7 +587,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
       color: '#e2e8f0'
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quando&family=Eagle+Lake&family=Open+Sans:wght@400;500;600&display=swap');
         
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -681,23 +681,26 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
 
       <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{
-            fontFamily: "'Montserrat', sans-serif", fontSize: '28px',
-            color: '#cbd5e1', marginBottom: '8px', fontWeight: '600'
+        <div style={{ textAlign: 'left', marginBottom: '30px' }}>
+          <p style={{
+            fontFamily: "'Open Sans', sans-serif",
+            fontSize: '18px',
+            fontStyle: 'italic',
+            color: '#e8e8e8',
+            fontWeight: '400'
           }}>
             Welcome back, <span style={{
               background: 'linear-gradient(135deg, #f8c471, #fab1a0)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               backgroundClip: 'text', fontWeight: '800'
-            }}>{userName || 'Chef'}</span>! 👋🏽
-          </h2>
+            }}>{userName || 'Chef'}</span>!
+          </p>
           <h1 style={{
-            fontFamily: "'Montserrat', sans-serif", fontSize: '48px', fontWeight: '800',
+            fontFamily: "'Quando', serif", fontSize: '80px', fontWeight: '400',
             background: 'linear-gradient(135deg, #f8c471, #fab1a0, #ff9f43)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             backgroundClip: 'text', marginBottom: '8px', letterSpacing: '3px',
-            animation: 'glow 2.5s ease-in-out infinite alternate'
+            animation: 'intensePulse 2s ease-in-out infinite alternate'
           }}>
             CHEF
           </h1>
@@ -951,9 +954,8 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
           <div style={{ marginTop: '50px' }}>
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>
               <h2 style={{
-                fontFamily: "'Montserrat', sans-serif", fontSize: '18px',
-                fontWeight: '700', color: '#f8c471', letterSpacing: '2px',
-                textTransform: 'uppercase', margin: 0
+                fontFamily: "'Open Sans', sans-serif", fontSize: '22px',
+                fontWeight: '400', fontStyle: 'italic', color: '#f8c471', letterSpacing: '1px', margin: 0
               }}>
                 Your Curated Recipes ({recipes.length})
               </h2>
@@ -976,8 +978,13 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                   alignItems: 'flex-start', marginBottom: '15px'
                 }}>
                   <h3 style={{
-                    fontFamily: "'Montserrat', sans-serif", fontSize: '28px',
-                    fontWeight: '700', color: '#e2e8f0', margin: 0, flex: 1
+                    fontFamily: "'Eagle Lake', cursive", fontSize: '38px',
+                    fontWeight: '400',
+                    background: 'linear-gradient(135deg, #f8c471, #fab1a0, #ff9f43)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    margin: 0, flex: 1, letterSpacing: '2px'
                   }}>
                     {recipe.name}
                   </h3>
@@ -1027,6 +1034,54 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                     {recipe.servings}
                   </span>
                 </div>
+
+
+                {/* Ingredients Section */}
+                {recipe.ingredients && recipe.ingredients.length > 0 && (
+                  <div style={{
+                    marginBottom: '25px',
+                    padding: '25px',
+                    background: '#111827',
+                    borderRadius: '12px',
+                    border: '2px solid #374151'
+                  }}>
+                    <h4 style={{
+                      fontFamily: "'Open Sans', sans-serif",
+                      fontSize: '16px',
+                      fontWeight: '700',
+                      color: '#f8c471',
+                      marginBottom: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}>
+                      <span>🥘</span> Ingredients
+                    </h4>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                      gap: '12px'
+                    }}>
+                      {recipe.ingredients.map((ingredient, idx) => (
+                        <div key={idx} style={{
+                          padding: '10px 14px',
+                          background: '#1f2937',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#cbd5e1',
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          fontFamily: "'Open Sans', sans-serif"
+                        }}>
+                          <span style={{ fontSize: '18px' }}>{getIngredientIcon(ingredient)}</span>
+                          {ingredient}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <button
                   onClick={() => toggleInstructions(index)}
@@ -1093,6 +1148,39 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                       ))}
                     </ol>
                   </div>
+
+                    {/* Pro Tips Section */}
+                    {recipe.tips && recipe.tips.length > 0 && (
+                      <div style={{
+                        marginTop: '20px',
+                        padding: '18px 22px',
+                        background: 'rgba(248, 196, 113, 0.1)',
+                        borderRadius: '10px',
+                        border: '2px solid rgba(248, 196, 113, 0.3)'
+                      }}>
+                        <div style={{
+                          fontFamily: "'Open Sans', sans-serif",
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#f8c471',
+                          marginBottom: '10px'
+                        }}>
+                          💡 Pro Tips
+                        </div>
+                        <div style={{
+                          color: '#cbd5e1',
+                          fontSize: '13px',
+                          lineHeight: '1.7',
+                          fontFamily: "'Open Sans', sans-serif"
+                        }}>
+                          {recipe.tips.map((tip, idx) => (
+                            <div key={idx} style={{ marginBottom: '5px' }}>
+                              • {tip}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                 )}
               </div>
             ))}
