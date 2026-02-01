@@ -303,7 +303,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
         position: 'relative'
       }}>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Quando&family=Eagle+Lake&family=Open+Sans:wght@400;500;600&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Eagle+Lake&family=Open+Sans:wght@400;500;600&display=swap');
           
           @keyframes fadeIn {
             from { opacity: 0; }
@@ -587,7 +587,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
       color: '#e2e8f0'
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Quando&family=Eagle+Lake&family=Open+Sans:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Eagle+Lake&family=Open+Sans:wght@400;500;600&display=swap');
         
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -978,7 +978,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                   alignItems: 'flex-start', marginBottom: '15px'
                 }}>
                   <h3 style={{
-                    fontFamily: "'Eagle Lake', cursive", fontSize: '38px',
+                    fontFamily: "'Quattrocento', serif", fontSize: '38px',
                     fontWeight: '400',
                     background: 'linear-gradient(135deg, #f8c471, #fab1a0, #ff9f43)',
                     WebkitBackgroundClip: 'text',
