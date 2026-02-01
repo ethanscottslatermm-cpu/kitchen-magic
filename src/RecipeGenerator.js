@@ -1036,7 +1036,6 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                 </div>
 
 
-                {/* Ingredients Section */}
                 {recipe.ingredients && recipe.ingredients.length > 0 && (
                   <div style={{
                     marginBottom: '25px',
@@ -1149,7 +1148,6 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                     </ol>
                   </div>
                   
-                  {/* Pro Tips Section */}
                   {recipe.tips && recipe.tips.length > 0 && (
                     <div style={{
                       marginTop: '20px',
