@@ -1181,7 +1181,6 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                   </div>
                 )}
               </div>
-            </div>
             ))}
           </div>
         )}
