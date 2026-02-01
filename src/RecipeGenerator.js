@@ -1146,41 +1146,41 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                         </li>
                       ))}
                     </ol>
+                    
+                    {recipe.tips && recipe.tips.length > 0 && (
+                      <div style={{
+                        marginTop: '20px',
+                        padding: '18px 22px',
+                        background: 'rgba(248, 196, 113, 0.1)',
+                        borderRadius: '10px',
+                        border: '2px solid rgba(248, 196, 113, 0.3)'
+                      }}>
+                        <div style={{
+                          fontFamily: "'Open Sans', sans-serif",
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#f8c471',
+                          marginBottom: '10px'
+                        }}>
+                          💡 Pro Tips
+                        </div>
+                        <div style={{
+                          color: '#cbd5e1',
+                          fontSize: '13px',
+                          lineHeight: '1.7',
+                          fontFamily: "'Open Sans', sans-serif"
+                        }}>
+                          {recipe.tips.map((tip, idx) => (
+                            <div key={idx} style={{ marginBottom: '5px' }}>
+                              • {tip}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  {recipe.tips && recipe.tips.length > 0 && (
-                    <div style={{
-                      marginTop: '20px',
-                      padding: '18px 22px',
-                      background: 'rgba(248, 196, 113, 0.1)',
-                      borderRadius: '10px',
-                      border: '2px solid rgba(248, 196, 113, 0.3)'
-                    }}>
-                      <div style={{
-                        fontFamily: "'Open Sans', sans-serif",
-                        fontSize: '14px',
-                        fontWeight: '700',
-                        color: '#f8c471',
-                        marginBottom: '10px'
-                      }}>
-                        💡 Pro Tips
-                      </div>
-                      <div style={{
-                        color: '#cbd5e1',
-                        fontSize: '13px',
-                        lineHeight: '1.7',
-                        fontFamily: "'Open Sans', sans-serif"
-                      }}>
-                        {recipe.tips.map((tip, idx) => (
-                          <div key={idx} style={{ marginBottom: '5px' }}>
-                            • {tip}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
             ))}
           </div>
