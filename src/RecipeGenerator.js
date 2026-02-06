@@ -678,7 +678,28 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
           from { box-shadow: 0 8px 30px rgba(248, 196, 113, 0.5); }
           to { box-shadow: 0 12px 40px rgba(248, 196, 113, 0.7); }
         }
-        
+
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+
+        @keyframes blink {
+          50% { border-color: transparent; }
+        }
+
+        @keyframes removeCursor {
+          to { border-right-color: transparent; }
+        }
+
+        .typewriter {
+          overflow: hidden;
+          border-right: 3px solid #f8c471;
+          white-space: nowrap;
+          display: inline-block;
+          animation: typewriter 3s steps(40) 1s forwards, blink 0.75s step-end infinite 1s, removeCursor 0s 4s forwards;
+        }
+
         .ingredient-chip {
           animation: slideUp 0.3s ease-out backwards;
         }
