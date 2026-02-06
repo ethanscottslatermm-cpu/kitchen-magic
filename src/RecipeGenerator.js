@@ -290,6 +290,45 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
   };
 
   // Welcome Screen
+
+  // Original Chef Hat SVG Component
+  const ChefHatSVG = () => (
+    <svg width="140" height="140" viewBox="0 0 200 200" style={{ filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4))' }}>
+      <g transform="translate(100, 100)">
+        <path d="M -60 20 Q -60 -10, -50 -30 L 50 -30 Q 60 -10, 60 20 L 60 40 L -60 40 Z" 
+          fill="#f8f8f8" 
+          stroke="#2d2d2d" 
+          strokeWidth="3"/>
+        
+        <circle cx="-45" cy="-25" r="22" fill="#ffffff" stroke="#2d2d2d" strokeWidth="3"/>
+        <circle cx="-20" cy="-35" r="25" fill="#ffffff" stroke="#2d2d2d" strokeWidth="3"/>
+        <circle cx="0" cy="-40" r="28" fill="#ffffff" stroke="#2d2d2d" strokeWidth="3"/>
+        <circle cx="20" cy="-35" r="25" fill="#ffffff" stroke="#2d2d2d" strokeWidth="3"/>
+        <circle cx="45" cy="-25" r="22" fill="#ffffff" stroke="#2d2d2d" strokeWidth="3"/>
+        
+        <rect x="-60" y="35" width="120" height="15" fill="#e8e8e8" stroke="#2d2d2d" strokeWidth="3"/>
+        
+        <line x1="-40" y1="-5" x2="-40" y2="25" stroke="#d0d0d0" strokeWidth="2"/>
+        <line x1="-20" y1="-5" x2="-20" y2="25" stroke="#d0d0d0" strokeWidth="2"/>
+        <line x1="0" y1="-5" x2="0" y2="25" stroke="#d0d0d0" strokeWidth="2"/>
+        <line x1="20" y1="-5" x2="20" y2="25" stroke="#d0d0d0" strokeWidth="2"/>
+        <line x1="40" y1="-5" x2="40" y2="25" stroke="#d0d0d0" strokeWidth="2"/>
+      </g>
+      
+      <g transform="translate(40, 150) rotate(-30)">
+        <rect x="-2" y="0" width="4" height="35" fill="#4a4a4a" stroke="#2d2d2d" strokeWidth="1.5"/>
+        <rect x="-8" y="30" width="4" height="15" fill="#4a4a4a" stroke="#2d2d2d" strokeWidth="1.5"/>
+        <rect x="-2" y="30" width="4" height="15" fill="#4a4a4a" stroke="#2d2d2d" strokeWidth="1.5"/>
+        <rect x="4" y="30" width="4" height="15" fill="#4a4a4a" stroke="#2d2d2d" strokeWidth="1.5"/>
+      </g>
+      
+      <g transform="translate(160, 150) rotate(30)">
+        <ellipse cx="0" cy="35" rx="6" ry="8" fill="#4a4a4a" stroke="#2d2d2d" strokeWidth="1.5"/>
+        <rect x="-2" y="0" width="4" height="35" fill="#4a4a4a" stroke="#2d2d2d" strokeWidth="1.5"/>
+      </g>
+    </svg>
+  );
+
   if (showWelcome) {
     return (
       <div style={{
@@ -344,12 +383,16 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
             50% { border-color: transparent; }
           }
 
+          @keyframes removeCursor {
+            to { border-right-color: transparent; }
+          }
+
           .typewriter {
             overflow: hidden;
             border-right: 3px solid #f8c471;
             white-space: nowrap;
             margin: 0 auto;
-            animation: typewriter 3s steps(40) 1s forwards, blink 0.75s step-end infinite;
+            animation: typewriter 3s steps(40) 1s forwards, blink 0.75s step-end infinite 1s, removeCursor 0s 4s forwards;
             width: 0;
           }
 
