@@ -25,6 +25,7 @@ const LetsEatLogo = ({ size = 250 }) => (
         height: 'auto',
         opacity: 1,
         transition: 'opacity 0.3s ease',
+        filter: 'drop-shadow(0 0 18px rgba(243,146,0,0.55)) drop-shadow(0 0 6px rgba(160,69,31,0.35))',
       }}
     />
   </div>
@@ -382,7 +383,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
 
         <div style={{ maxWidth: '520px', width: '100%', textAlign: 'center' }}>
           {/* Logo */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '36px', animation: 'fadeUp 0.7s ease-out' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', animation: 'fadeUp 0.7s ease-out' }}>
             <LetsEatLogo size={360} />
           </div>
 
@@ -415,13 +416,14 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
               placeholder="Your name..."
               style={{
                 width: '100%', padding: '14px 18px',
-                border: '2px solid var(--border)',
+                border: '2px solid rgba(243,146,0,0.4)',
                 borderRadius: '12px', fontSize: '15px',
                 fontFamily: "'Nunito', sans-serif",
                 textAlign: 'center', background: 'var(--cream)',
                 color: 'var(--text-dark)',
                 transition: 'border-color 0.2s, box-shadow 0.2s',
-                marginBottom: '24px'
+                marginBottom: '24px',
+                boxShadow: '0 0 0 3px rgba(243,146,0,0.12), 0 0 18px rgba(243,146,0,0.18)'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--amber)';
@@ -437,7 +439,8 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
             <div style={{
               background: 'var(--cream)', borderRadius: '12px',
               padding: '18px 20px', marginBottom: '24px',
-              border: '1px solid var(--border)', textAlign: 'left'
+              border: '1px solid rgba(243,146,0,0.35)', textAlign: 'left',
+              boxShadow: '0 0 0 3px rgba(243,146,0,0.10), 0 0 18px rgba(243,146,0,0.15)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{
@@ -490,7 +493,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                 textTransform: 'uppercase',
                 fontFamily: "'Nunito', sans-serif",
                 cursor: userName.trim() ? 'pointer' : 'not-allowed',
-                boxShadow: userName.trim() ? '0 8px 24px rgba(243,146,0,0.45)' : 'none',
+                boxShadow: userName.trim() ? '0 8px 24px rgba(243,146,0,0.55), 0 0 30px rgba(243,146,0,0.3), inset 0 0 12px rgba(255,255,255,0.12)' : 'none',
                 transition: 'all 0.25s ease',
                 animation: userName.trim() ? 'pulse-amber 2.5s infinite' : 'none'
               }}
@@ -555,6 +558,34 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
       )}
 
       <div style={{ maxWidth: '860px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+
+        {/* Return Home button */}
+        <div style={{ position: 'absolute', top: '0px', left: '0px', zIndex: 10 }}>
+          <button
+            onClick={() => setShowWelcome(true)}
+            style={{
+              background: 'rgba(255,255,255,0.6)',
+              border: '1.5px solid var(--border)',
+              borderRadius: '10px',
+              padding: '8px 14px',
+              color: 'var(--brown-dark)',
+              fontSize: '13px',
+              fontWeight: '700',
+              fontFamily: "'Nunito', sans-serif",
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 2px 10px rgba(93,42,24,0.1)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.9)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.6)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
+            ← Home
+          </button>
+        </div>
 
         {/* Header: Logo centered */}
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>
@@ -695,7 +726,6 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
                   display: 'flex', alignItems: 'center', gap: '8px',
                   boxShadow: '0 2px 8px rgba(93,42,24,0.06)'
                 }}>
-                  <span style={{ fontSize: '18px' }}>{getIngredientIcon(ingredient)}</span>
                   <span style={{ flex: 1, color: 'var(--text-dark)', fontWeight: '600', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {ingredient}
                   </span>
