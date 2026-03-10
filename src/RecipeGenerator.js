@@ -383,7 +383,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
         <div style={{ maxWidth: '520px', width: '100%', textAlign: 'center' }}>
           {/* Logo */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '36px', animation: 'fadeUp 0.7s ease-out' }}>
-            <LetsEatLogo size={260} />
+            <LetsEatLogo size={360} />
           </div>
 
           {/* Card */}
@@ -559,7 +559,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
         {/* Header: Logo centered */}
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px', animation: 'fadeUp 0.6s ease-out' }}>
-            <LetsEatLogo size={220} />
+            <LetsEatLogo size={320} />
           </div>
           <p style={{
             fontFamily: "'Nunito', sans-serif",
@@ -738,7 +738,7 @@ Return 3-4 recipes maximum. Focus on simple, approachable home cooking. Return O
             borderRadius: '20px'
           }}>
             <div style={{ marginBottom: '24px', animation: 'cookBounce 1.2s ease-in-out infinite' }}>
-              <LetsEatLogo size={160} />
+              <LetsEatLogo size={220} />
             </div>
             <p style={{
               fontFamily: "'Playfair Display', serif",
