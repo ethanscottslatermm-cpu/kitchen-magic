@@ -1,184 +1,51 @@
-/**
- * Copyright (c) 2026 Monarch-Elite Holdings
- * All Rights Reserved
- * 
- * Kitchen Magic - Recipe Generator
- * Updated with: Language selection, Did You Know sidebar, 
- * improved recipe cards, loading GIF, text-only ingredients/search
- */
+// ============================================================================
+// KITCHEN MAGIC - RecipeGenerator.js CHANGES GUIDE
+// ============================================================================
+// This file contains ALL the code changes to apply to your original
+// RecipeGenerator.js. Follow the numbered instructions below.
+//
+// CHANGES:
+// 1. "Did You Know?" sidebar on Page 2
+// 2. Remove ingredient/search image icons
+// 3. Verify recipe generation (JSON parsing hardened)
+// 4. Improved recipe card layout (narrower, rounded, better spacing)
+// 5. Language selection on Page 1
+// 6. Loading GIF + animated text instead of logo
+// ============================================================================
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, Download } from 'lucide-react';
+// ============================================================================
+// CHANGE 1: ADD THESE CONSTANTS AFTER THE CHEF_IMG / LetsEatLogo DECLARATIONS
+// (Insert right before "export default function RecipeGenerator()")
+// ============================================================================
 
 // ─── Food Facts for "Did You Know?" Sidebar ─────────────────────────────────
 const FOOD_FACTS = [
-  "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still edible!",
-  "Bananas are berries, but strawberries aren't — botanically speaking!",
-  "The world's most expensive spice by weight is saffron, costing up to $5,000 per pound.",
+  "Honey never spoils. Archaeologists found 3,000-year-old honey in Egyptian tombs that was still edible!",
+  "Bananas are berries, but strawberries are not — botanically speaking!",
+  "The most expensive spice by weight is saffron, costing up to $5,000 per pound.",
   "Apples float in water because they are 25% air.",
   "It takes about 12 pounds of milk to make just 1 pound of cheese.",
   "Carrots were originally purple before the 17th century!",
-  "A single spaghetti noodle is called a 'spaghetto'.",
-  "Peanuts are not nuts — they're legumes that grow underground.",
+  "A single spaghetti noodle is called a spaghetto.",
+  "Peanuts are not nuts — they are legumes that grow underground.",
   "Chocolate was once used as currency by the Aztecs.",
   "The average American eats about 23 pounds of pizza per year.",
   "Vanilla is the second most expensive spice after saffron.",
-  "Cranberries can bounce like rubber balls when they're ripe!",
+  "Cranberries can bounce like rubber balls when they are ripe!",
   "Nutmeg in large doses can cause hallucinations.",
-  "The fear of cooking is called 'mageirocophobia'.",
+  "The fear of cooking is called mageirocophobia.",
   "Ketchup was sold as medicine in the 1830s.",
   "Almonds are members of the peach family.",
-  "One ear of corn has about 800 kernels arranged in 16 rows.",
   "Avocados are actually a fruit, not a vegetable!",
   "The most stolen food in the world is cheese.",
-  "Lemons contain more sugar than strawberries."
+  "Lemons contain more sugar than strawberries.",
+  "Worcestershire sauce is made from fermented anchovies."
 ];
 
-// ─── Language Translations ───────────────────────────────────────────────────
-const TRANSLATIONS = {
-  en: {
-    appTitle: "Kitchen Magic",
-    welcomeBack: "Welcome Back, Chef! 🍳",
-    didYouKnow: "Did You Know?",
-    ingredients: "Ingredients",
-    ingredientPlaceholder: "Enter an ingredient (e.g., chicken, rice, tomato)",
-    addIngredient: "Add",
-    search: "Search Recipes",
-    searchPlaceholder: "Search for a recipe...",
-    generateRecipe: "Generate Recipe ✨",
-    generating: "Creating something delicious...",
-    generatingAlt: "Cooking up magic...",
-    recipeResult: "Your Recipe",
-    servings: "Servings",
-    prepTime: "Prep Time",
-    cookTime: "Cook Time",
-    instructions: "Instructions",
-    noIngredients: "Add some ingredients to get started!",
-    removeIngredient: "Remove",
-    selectLanguage: "Select Language",
-    getStarted: "Let's Cook!",
-    loading: "Preparing your kitchen...",
-    clearAll: "Clear All",
-    tryAgain: "Try Again",
-    errorMessage: "Something went wrong. Please try again.",
-    back: "← Back",
-    downloadRecipe: "Download Recipe",
-  },
-  es: {
-    appTitle: "Magia en la Cocina",
-    welcomeBack: "¡Bienvenido de nuevo, Chef! 🍳",
-    didYouKnow: "¿Sabías que...?",
-    ingredients: "Ingredientes",
-    ingredientPlaceholder: "Ingresa un ingrediente (ej: pollo, arroz, tomate)",
-    addIngredient: "Agregar",
-    search: "Buscar Recetas",
-    searchPlaceholder: "Buscar una receta...",
-    generateRecipe: "Generar Receta ✨",
-    generating: "Creando algo delicioso...",
-    generatingAlt: "Cocinando magia...",
-    recipeResult: "Tu Receta",
-    servings: "Porciones",
-    prepTime: "Tiempo de Preparación",
-    cookTime: "Tiempo de Cocción",
-    instructions: "Instrucciones",
-    noIngredients: "¡Agrega algunos ingredientes para comenzar!",
-    removeIngredient: "Quitar",
-    selectLanguage: "Seleccionar Idioma",
-    getStarted: "¡A Cocinar!",
-    loading: "Preparando tu cocina...",
-    clearAll: "Limpiar Todo",
-    tryAgain: "Intentar de Nuevo",
-    errorMessage: "Algo salió mal. Por favor, intenta de nuevo.",
-    back: "← Atrás",
-    downloadRecipe: "Descargar Receta",
-  },
-  fr: {
-    appTitle: "Magie en Cuisine",
-    welcomeBack: "Bienvenue, Chef ! 🍳",
-    didYouKnow: "Le saviez-vous ?",
-    ingredients: "Ingrédients",
-    ingredientPlaceholder: "Entrez un ingrédient (ex : poulet, riz, tomate)",
-    addIngredient: "Ajouter",
-    search: "Chercher des Recettes",
-    searchPlaceholder: "Rechercher une recette...",
-    generateRecipe: "Générer une Recette ✨",
-    generating: "Création de quelque chose de délicieux...",
-    generatingAlt: "Cuisine magique en cours...",
-    recipeResult: "Votre Recette",
-    servings: "Portions",
-    prepTime: "Temps de Préparation",
-    cookTime: "Temps de Cuisson",
-    instructions: "Instructions",
-    noIngredients: "Ajoutez des ingrédients pour commencer !",
-    removeIngredient: "Retirer",
-    selectLanguage: "Choisir la Langue",
-    getStarted: "Cuisinons !",
-    loading: "Préparation de votre cuisine...",
-    clearAll: "Tout Effacer",
-    tryAgain: "Réessayer",
-    errorMessage: "Quelque chose s'est mal passé. Veuillez réessayer.",
-    back: "← Retour",
-    downloadRecipe: "Télécharger la Recette",
-  },
-  de: {
-    appTitle: "Küchenmagie",
-    welcomeBack: "Willkommen zurück, Küchenchef! 🍳",
-    didYouKnow: "Wussten Sie?",
-    ingredients: "Zutaten",
-    ingredientPlaceholder: "Zutat eingeben (z.B. Hähnchen, Reis, Tomate)",
-    addIngredient: "Hinzufügen",
-    search: "Rezepte Suchen",
-    searchPlaceholder: "Nach einem Rezept suchen...",
-    generateRecipe: "Rezept Generieren ✨",
-    generating: "Etwas Leckeres wird kreiert...",
-    generatingAlt: "Zauberküche...",
-    recipeResult: "Ihr Rezept",
-    servings: "Portionen",
-    prepTime: "Vorbereitungszeit",
-    cookTime: "Kochzeit",
-    instructions: "Anweisungen",
-    noIngredients: "Fügen Sie Zutaten hinzu, um zu beginnen!",
-    removeIngredient: "Entfernen",
-    selectLanguage: "Sprache Wählen",
-    getStarted: "Los Kochen!",
-    loading: "Küche wird vorbereitet...",
-    clearAll: "Alles Löschen",
-    tryAgain: "Erneut Versuchen",
-    errorMessage: "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-    back: "← Zurück",
-    downloadRecipe: "Rezept Herunterladen",
-  },
-  zh: {
-    appTitle: "厨房魔法",
-    welcomeBack: "欢迎回来，大厨！🍳",
-    didYouKnow: "你知道吗？",
-    ingredients: "食材",
-    ingredientPlaceholder: "输入食材（例如：鸡肉、米饭、番茄）",
-    addIngredient: "添加",
-    search: "搜索食谱",
-    searchPlaceholder: "搜索食谱...",
-    generateRecipe: "生成食谱 ✨",
-    generating: "正在创造美味...",
-    generatingAlt: "烹饪魔法中...",
-    recipeResult: "你的食谱",
-    servings: "份量",
-    prepTime: "准备时间",
-    cookTime: "烹饪时间",
-    instructions: "步骤",
-    noIngredients: "添加一些食材开始吧！",
-    removeIngredient: "移除",
-    selectLanguage: "选择语言",
-    getStarted: "开始烹饪！",
-    loading: "准备你的厨房...",
-    clearAll: "清除全部",
-    tryAgain: "重试",
-    errorMessage: "出了点问题，请重试。",
-    back: "← 返回",
-    downloadRecipe: "下载食谱",
-  }
-};
+const LOADING_GIF = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3g4bHR1Ym9vYWlzaW54cHVibjR4MnFpNTFzaDdxZDlmc2hob2l3YiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dWacKLne4EowGUaVUw/giphy.gif";
 
-const LANGUAGE_OPTIONS = [
+// ─── Language System ─────────────────────────────────────────────────────────
+const LANGUAGES = [
   { code: 'en', label: '🇺🇸 English' },
   { code: 'es', label: '🇪🇸 Español' },
   { code: 'fr', label: '🇫🇷 Français' },
@@ -186,511 +53,147 @@ const LANGUAGE_OPTIONS = [
   { code: 'zh', label: '🇨🇳 中文' },
 ];
 
-// ─── Loading GIF URL ─────────────────────────────────────────────────────────
-const LOADING_GIF = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3g4bHR1Ym9vYWlzaW54cHVibjR4MnFpNTFzaDdxZDlmc2hob2l3YiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dWacKLne4EowGUaVUw/giphy.gif";
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-const styles = {
-  // Global
-  container: {
-    minHeight: '100vh',
-    fontFamily: "'Nunito', 'Segoe UI', sans-serif",
-    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    color: '#e8e8e8',
-    position: 'relative',
-    overflow: 'hidden',
+const TRANSLATIONS = {
+  en: {
+    welcomeChef: 'Welcome, Chef!',
+    tellUs: 'Tell us your name to get started',
+    yourName: 'Your name...',
+    letsCook: "Let's Cook! 🍳",
+    selectLang: 'SELECT LANGUAGE',
+    termsTitle: 'Terms & Conditions',
+    welcomeBack: (name) => `Welcome back, ${name || 'Chef'}! What are we cooking today?`,
+    whatIngredients: 'What ingredients do you have?',
+    scanPhoto: '📷 Scan Ingredients from Photo',
+    startTyping: 'Start typing an ingredient...',
+    add: 'Add',
+    generateRecipes: '✨  Generate Recipes',
+    generating: '⏳  Generating Recipes...',
+    cookingUp: 'Cooking up something delicious...',
+    hangTight: 'Hang tight while we find the perfect recipes for you 🍳',
+    curatedRecipes: 'Your Curated Recipes',
+    found: 'found',
+    ingredients: 'Ingredients',
+    viewInstructions: 'View Cooking Instructions',
+    hideInstructions: 'Hide Cooking Instructions',
+    home: '← Home',
+    didYouKnow: '💡 Did You Know?',
   },
-  // Loading Page (Page 1)
-  loadingPage: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    padding: '20px',
-    textAlign: 'center',
+  es: {
+    welcomeChef: '¡Bienvenido, Chef!',
+    tellUs: 'Dinos tu nombre para empezar',
+    yourName: 'Tu nombre...',
+    letsCook: '¡A Cocinar! 🍳',
+    selectLang: 'SELECCIONAR IDIOMA',
+    termsTitle: 'Términos y Condiciones',
+    welcomeBack: (name) => `¡Bienvenido de nuevo, ${name || 'Chef'}! ¿Qué cocinamos hoy?`,
+    whatIngredients: '¿Qué ingredientes tienes?',
+    scanPhoto: '📷 Escanear Ingredientes de Foto',
+    startTyping: 'Escribe un ingrediente...',
+    add: 'Agregar',
+    generateRecipes: '✨  Generar Recetas',
+    generating: '⏳  Generando Recetas...',
+    cookingUp: 'Preparando algo delicioso...',
+    hangTight: 'Espera mientras encontramos las recetas perfectas 🍳',
+    curatedRecipes: 'Tus Recetas Seleccionadas',
+    found: 'encontradas',
+    ingredients: 'Ingredientes',
+    viewInstructions: 'Ver Instrucciones',
+    hideInstructions: 'Ocultar Instrucciones',
+    home: '← Inicio',
+    didYouKnow: '💡 ¿Sabías que...?',
   },
-  loadingGif: {
-    width: '280px',
-    height: '280px',
-    borderRadius: '20px',
-    objectFit: 'cover',
-    marginBottom: '30px',
-    boxShadow: '0 10px 40px rgba(233, 69, 96, 0.3)',
+  fr: {
+    welcomeChef: 'Bienvenue, Chef !',
+    tellUs: 'Dites-nous votre nom pour commencer',
+    yourName: 'Votre nom...',
+    letsCook: 'Cuisinons ! 🍳',
+    selectLang: 'CHOISIR LA LANGUE',
+    termsTitle: 'Conditions Générales',
+    welcomeBack: (name) => `Bienvenue, ${name || 'Chef'} ! Que cuisinons-nous aujourd\'hui ?`,
+    whatIngredients: 'Quels ingrédients avez-vous ?',
+    scanPhoto: '📷 Scanner les Ingrédients',
+    startTyping: 'Tapez un ingrédient...',
+    add: 'Ajouter',
+    generateRecipes: '✨  Générer des Recettes',
+    generating: '⏳  Génération en cours...',
+    cookingUp: 'Préparation de quelque chose de délicieux...',
+    hangTight: 'Patientez pendant que nous trouvons les recettes parfaites 🍳',
+    curatedRecipes: 'Vos Recettes',
+    found: 'trouvées',
+    ingredients: 'Ingrédients',
+    viewInstructions: 'Voir les Instructions',
+    hideInstructions: 'Masquer les Instructions',
+    home: '← Accueil',
+    didYouKnow: '💡 Le saviez-vous ?',
   },
-  loadingTextContainer: {
-    height: '60px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+  de: {
+    welcomeChef: 'Willkommen, Küchenchef!',
+    tellUs: 'Sag uns deinen Namen',
+    yourName: 'Dein Name...',
+    letsCook: 'Los Kochen! 🍳',
+    selectLang: 'SPRACHE WÄHLEN',
+    termsTitle: 'Nutzungsbedingungen',
+    welcomeBack: (name) => `Willkommen zurück, ${name || 'Chef'}! Was kochen wir heute?`,
+    whatIngredients: 'Welche Zutaten hast du?',
+    scanPhoto: '📷 Zutaten vom Foto scannen',
+    startTyping: 'Zutat eingeben...',
+    add: 'Hinzufügen',
+    generateRecipes: '✨  Rezepte Generieren',
+    generating: '⏳  Rezepte werden generiert...',
+    cookingUp: 'Etwas Leckeres wird zubereitet...',
+    hangTight: 'Einen Moment bitte, wir finden die perfekten Rezepte 🍳',
+    curatedRecipes: 'Deine Rezepte',
+    found: 'gefunden',
+    ingredients: 'Zutaten',
+    viewInstructions: 'Anweisungen anzeigen',
+    hideInstructions: 'Anweisungen ausblenden',
+    home: '← Startseite',
+    didYouKnow: '💡 Wussten Sie?',
   },
-  loadingText: {
-    fontSize: '24px',
-    fontWeight: '700',
-    background: 'linear-gradient(90deg, #e94560, #f5a623, #e94560)',
-    backgroundSize: '200% 100%',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    animation: 'shimmer 2s ease-in-out infinite',
-  },
-  // Language Selection
-  languageSection: {
-    marginTop: '40px',
-    width: '100%',
-    maxWidth: '360px',
-  },
-  languageLabel: {
-    fontSize: '14px',
-    color: '#a0a0b8',
-    marginBottom: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '2px',
-    fontWeight: '600',
-  },
-  languageGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-    gap: '10px',
-  },
-  languageBtn: (isSelected) => ({
-    padding: '12px 16px',
-    borderRadius: '12px',
-    border: isSelected ? '2px solid #e94560' : '2px solid rgba(255,255,255,0.1)',
-    background: isSelected ? 'rgba(233, 69, 96, 0.15)' : 'rgba(255,255,255,0.05)',
-    color: isSelected ? '#e94560' : '#c8c8d8',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: '600',
-    transition: 'all 0.3s ease',
-    textAlign: 'center',
-  }),
-  getStartedBtn: {
-    marginTop: '30px',
-    padding: '16px 48px',
-    borderRadius: '50px',
-    border: 'none',
-    background: 'linear-gradient(135deg, #e94560, #c23152)',
-    color: '#fff',
-    fontSize: '18px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    boxShadow: '0 6px 20px rgba(233, 69, 96, 0.4)',
-    transition: 'all 0.3s ease',
-    letterSpacing: '1px',
-  },
-  // Main Page (Page 2)
-  mainPage: {
-    display: 'flex',
-    minHeight: '100vh',
-  },
-  sidebar: {
-    width: '280px',
-    background: 'rgba(0,0,0,0.2)',
-    borderRight: '1px solid rgba(255,255,255,0.06)',
-    padding: '24px 16px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  sidebarBubble: {
-    background: 'rgba(233, 69, 96, 0.1)',
-    border: '1px solid rgba(233, 69, 96, 0.25)',
-    borderRadius: '16px',
-    padding: '20px 16px',
-    marginTop: '20px',
-    width: '100%',
-    position: 'relative',
-    transition: 'opacity 0.6s ease, transform 0.6s ease',
-  },
-  sidebarBubbleTitle: {
-    fontSize: '13px',
-    fontWeight: '800',
-    color: '#e94560',
-    textTransform: 'uppercase',
-    letterSpacing: '1.5px',
-    marginBottom: '10px',
-    textAlign: 'center',
-  },
-  sidebarBubbleFact: {
-    fontSize: '13px',
-    color: '#c8c8d8',
-    lineHeight: '1.6',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  welcomeText: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#f5a623',
-    textAlign: 'center',
-    transition: 'opacity 0.5s ease',
-  },
-  mainContent: {
-    flex: 1,
-    padding: '32px 40px',
-    overflowY: 'auto',
-    maxHeight: '100vh',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '32px',
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: '800',
-    background: 'linear-gradient(90deg, #e94560, #f5a623)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-  },
-  backBtn: {
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.12)',
-    color: '#c8c8d8',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-  },
-  // Ingredients Section (NO images/icons)
-  section: {
-    marginBottom: '28px',
-  },
-  sectionTitle: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#e0e0e8',
-    marginBottom: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-  },
-  inputRow: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '12px',
-  },
-  textInput: {
-    flex: 1,
-    padding: '12px 16px',
-    borderRadius: '10px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
-    color: '#e8e8e8',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.3s',
-  },
-  addBtn: {
-    padding: '12px 20px',
-    borderRadius: '10px',
-    border: 'none',
-    background: 'linear-gradient(135deg, #e94560, #c23152)',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
-  ingredientTags: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px',
-  },
-  ingredientTag: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 14px',
-    borderRadius: '20px',
-    background: 'rgba(233, 69, 96, 0.12)',
-    border: '1px solid rgba(233, 69, 96, 0.3)',
-    color: '#e8c8c8',
-    fontSize: '13px',
-    fontWeight: '600',
-  },
-  removeTagBtn: {
-    background: 'none',
-    border: 'none',
-    color: '#e94560',
-    cursor: 'pointer',
-    padding: '0',
-    fontSize: '16px',
-    lineHeight: 1,
-  },
-  // Search Section (NO images/icons)
-  searchInput: {
-    width: '100%',
-    padding: '12px 16px',
-    borderRadius: '10px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
-    color: '#e8e8e8',
-    fontSize: '14px',
-    outline: 'none',
-    boxSizing: 'border-box',
-  },
-  // Generate Button
-  generateBtn: {
-    width: '100%',
-    padding: '16px 32px',
-    borderRadius: '14px',
-    border: 'none',
-    background: 'linear-gradient(135deg, #e94560, #c23152)',
-    color: '#fff',
-    fontSize: '17px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    boxShadow: '0 6px 24px rgba(233, 69, 96, 0.35)',
-    transition: 'all 0.3s ease',
-    letterSpacing: '0.5px',
-    marginTop: '8px',
-  },
-  generateBtnDisabled: {
-    opacity: 0.6,
-    cursor: 'not-allowed',
-  },
-  // Recipe Card (improved layout — narrower, rounded, polished)
-  recipeCard: {
-    maxWidth: '560px',
-    margin: '24px auto 0',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '20px',
-    overflow: 'hidden',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-  },
-  recipeCardHeader: {
-    background: 'linear-gradient(135deg, rgba(233,69,96,0.15), rgba(245,166,35,0.1))',
-    padding: '24px 28px',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
-  },
-  recipeTitle: {
-    fontSize: '22px',
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: '8px',
-  },
-  recipeMeta: {
-    display: 'flex',
-    gap: '20px',
-    flexWrap: 'wrap',
-  },
-  recipeMetaItem: {
-    fontSize: '13px',
-    color: '#a0a0b8',
-    fontWeight: '600',
-  },
-  recipeMetaValue: {
-    color: '#f5a623',
-    fontWeight: '700',
-  },
-  recipeCardBody: {
-    padding: '24px 28px',
-  },
-  recipeIngredientsTitle: {
-    fontSize: '15px',
-    fontWeight: '700',
-    color: '#e94560',
-    marginBottom: '10px',
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-  },
-  recipeIngredientItem: {
-    fontSize: '14px',
-    color: '#c8c8d8',
-    padding: '4px 0',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
-    lineHeight: '1.5',
-  },
-  recipeInstructionsTitle: {
-    fontSize: '15px',
-    fontWeight: '700',
-    color: '#e94560',
-    marginTop: '20px',
-    marginBottom: '10px',
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-  },
-  recipeInstructionStep: {
-    fontSize: '14px',
-    color: '#c8c8d8',
-    padding: '8px 0',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
-    lineHeight: '1.6',
-  },
-  stepNumber: {
-    display: 'inline-block',
-    width: '24px',
-    height: '24px',
-    borderRadius: '50%',
-    background: 'rgba(233,69,96,0.2)',
-    color: '#e94560',
-    textAlign: 'center',
-    lineHeight: '24px',
-    fontSize: '12px',
-    fontWeight: '700',
-    marginRight: '10px',
-  },
-  // Error & loading states
-  generatingContainer: {
-    textAlign: 'center',
-    padding: '40px 20px',
-  },
-  generatingSpinner: {
-    width: '48px',
-    height: '48px',
-    border: '4px solid rgba(233,69,96,0.2)',
-    borderTopColor: '#e94560',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-    margin: '0 auto 16px',
-  },
-  errorBox: {
-    background: 'rgba(233,69,96,0.1)',
-    border: '1px solid rgba(233,69,96,0.3)',
-    borderRadius: '12px',
-    padding: '16px 20px',
-    textAlign: 'center',
-    color: '#e8a0a0',
-    fontSize: '14px',
-  },
-  clearBtn: {
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    color: '#a0a0b8',
-    padding: '6px 14px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: '600',
-    marginLeft: '12px',
-  },
-  // Mobile Responsive
-  '@media (max-width: 768px)': {
-    mainPage: { flexDirection: 'column' },
-    sidebar: { width: '100%', borderRight: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' },
-    mainContent: { padding: '20px' },
-  },
-};
-
-// ─── CSS Keyframes (injected) ────────────────────────────────────────────────
-const injectStyles = () => {
-  if (document.getElementById('kitchen-magic-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'kitchen-magic-styles';
-  style.textContent = `
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-    
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    @keyframes textCycle {
-      0%, 40% { opacity: 1; transform: translateY(0); }
-      45%, 55% { opacity: 0; transform: translateY(-10px); }
-      60%, 100% { opacity: 1; transform: translateY(0); }
-    }
-    
-    @keyframes bubblePop {
-      0% { opacity: 0; transform: scale(0.8) translateY(10px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    
-    @keyframes bubbleFade {
-      0% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(0.95) translateY(-5px); }
-    }
-    
-    .km-input:focus {
-      border-color: rgba(233, 69, 96, 0.5) !important;
-      box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
-    }
-    
-    .km-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(233, 69, 96, 0.45);
-    }
-    
-    .km-lang-btn:hover {
-      background: rgba(233, 69, 96, 0.1) !important;
-      border-color: rgba(233, 69, 96, 0.4) !important;
-    }
-    
-    .km-tag:hover .km-tag-remove {
-      color: #ff6b7f !important;
-    }
-    
-    @media (max-width: 768px) {
-      .km-main-page { flex-direction: column !important; }
-      .km-sidebar { 
-        width: 100% !important; 
-        border-right: none !important; 
-        border-bottom: 1px solid rgba(255,255,255,0.06) !important; 
-        padding: 16px !important;
-      }
-      .km-main-content { padding: 20px !important; }
-      .km-recipe-card { max-width: 100% !important; }
-    }
-    
-    @media (max-width: 480px) {
-      .km-main-content { padding: 14px !important; }
-      .km-header-title { font-size: 22px !important; }
-    }
-  `;
-  document.head.appendChild(style);
+  zh: {
+    welcomeChef: '欢迎，大厨！',
+    tellUs: '请输入您的名字开始',
+    yourName: '您的名字...',
+    letsCook: '开始烹饪！🍳',
+    selectLang: '选择语言',
+    termsTitle: '条款与条件',
+    welcomeBack: (name) => `欢迎回来，${name || '大厨'}！今天我们做什么？`,
+    whatIngredients: '你有哪些食材？',
+    scanPhoto: '📷 从照片扫描食材',
+    startTyping: '输入食材...',
+    add: '添加',
+    generateRecipes: '✨  生成食谱',
+    generating: '⏳  正在生成食谱...',
+    cookingUp: '正在烹制美味佳肴...',
+    hangTight: '请稍候，我们正在为您寻找完美的食谱 🍳',
+    curatedRecipes: '为您精选的食谱',
+    found: '个',
+    ingredients: '食材',
+    viewInstructions: '查看烹饪步骤',
+    hideInstructions: '隐藏烹饪步骤',
+    home: '← 首页',
+    didYouKnow: '💡 你知道吗？',
+  }
 };
 
 // ─── Did You Know Sidebar Component ─────────────────────────────────────────
-const DidYouKnowSidebar = ({ t }) => {
-  const [phase, setPhase] = useState('welcome'); // 'welcome' | 'bubble' | 'fact' | 'fadeout'
-  const [factIndex, setFactIndex] = useState(0);
-  const [factVisible, setFactVisible] = useState(false);
-  const timerRef = useRef(null);
+function DidYouKnowSidebar({ t }) {
+  const [phase, setPhase] = React.useState('welcome');
+  const [factIndex, setFactIndex] = React.useState(0);
+  const [factVisible, setFactVisible] = React.useState(false);
+  const timerRef = React.useRef(null);
 
-  useEffect(() => {
-    // Cycle: welcome (2s) -> bubble appears (0.5s) -> fact shows (3s) -> fadeout (0.5s) -> repeat
+  React.useEffect(() => {
     const cycle = () => {
-      // Phase 1: Show welcome
       setPhase('welcome');
       setFactVisible(false);
-
       timerRef.current = setTimeout(() => {
-        // Phase 2: Show bubble
         setPhase('bubble');
-
         timerRef.current = setTimeout(() => {
-          // Phase 3: Show fact
           setFactVisible(true);
-
           timerRef.current = setTimeout(() => {
-            // Phase 4: Fade out
             setPhase('fadeout');
-
             timerRef.current = setTimeout(() => {
-              // Next fact, restart cycle
               setFactIndex(prev => (prev + 1) % FOOD_FACTS.length);
               cycle();
             }, 600);
@@ -698,35 +201,38 @@ const DidYouKnowSidebar = ({ t }) => {
         }, 500);
       }, 2000);
     };
-
     cycle();
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, []);
 
   return (
-    <div style={styles.sidebar} className="km-sidebar">
-      {/* Welcome Text */}
-      <div style={{
-        ...styles.welcomeText,
-        opacity: phase === 'welcome' ? 1 : 0.4,
-        transition: 'opacity 0.5s ease',
-      }}>
-        {t.welcomeBack}
-      </div>
-
-      {/* Did You Know Bubble */}
+    <div style={{
+      position: 'fixed', right: '20px', top: '50%', transform: 'translateY(-50%)',
+      width: '240px', zIndex: 50, pointerEvents: 'none',
+    }}>
       {(phase === 'bubble' || phase === 'fact' || phase === 'fadeout') && (
         <div style={{
-          ...styles.sidebarBubble,
-          animation: phase === 'fadeout' ? 'bubbleFade 0.6s ease forwards' : 'bubblePop 0.5s ease forwards',
+          background: 'rgba(255,248,238,0.96)',
+          border: '1.5px solid rgba(243,146,0,0.35)',
+          borderRadius: '16px', padding: '18px 16px',
+          boxShadow: '0 8px 30px rgba(93,42,24,0.15)',
+          backdropFilter: 'blur(8px)',
+          animation: phase === 'fadeout'
+            ? 'fadeOut 0.6s ease forwards'
+            : 'fadeUp 0.5s ease forwards',
         }}>
-          <div style={styles.sidebarBubbleTitle}>
-            💡 {t.didYouKnow}
+          <div style={{
+            fontSize: '11px', fontWeight: '800', color: 'var(--brown-warm)',
+            textTransform: 'uppercase', letterSpacing: '1.5px',
+            marginBottom: '8px', textAlign: 'center',
+          }}>
+            {t.didYouKnow}
           </div>
           {factVisible && (
             <div style={{
-              ...styles.sidebarBubbleFact,
-              animation: 'fadeInUp 0.4s ease',
+              fontSize: '12.5px', color: 'var(--text-mid)', lineHeight: '1.65',
+              textAlign: 'center', fontStyle: 'italic',
+              animation: 'fadeUp 0.4s ease',
             }}>
               {FOOD_FACTS[factIndex]}
             </div>
@@ -735,380 +241,237 @@ const DidYouKnowSidebar = ({ t }) => {
       )}
     </div>
   );
-};
+}
 
-// ─── Loading Page Component (Page 1) ─────────────────────────────────────────
-const LoadingPage = ({ language, setLanguage, onStart, t }) => {
-  const [textIndex, setTextIndex] = useState(0);
-  const loadingTexts = [t.loading, t.generating, t.generatingAlt];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTextIndex(prev => (prev + 1) % loadingTexts.length);
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [t]);
+// ============================================================================
+// CHANGE 2: ADD THIS STATE INSIDE RecipeGenerator COMPONENT (near other useState calls)
+// ============================================================================
+// const [language, setLanguage] = useState('en');
 
-  return (
-    <div style={styles.loadingPage}>
-      {/* Loading GIF instead of logo */}
+// AND this derived value right after:
+// const t = TRANSLATIONS[language] || TRANSLATIONS.en;
+
+
+// ============================================================================
+// CHANGE 3: ADD THESE KEYFRAMES TO globalStyles (inside the template literal)
+// ============================================================================
+/*
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-8px); }
+    }
+
+    @keyframes textCycle {
+      0%, 40% { opacity: 1; }
+      50% { opacity: 0; }
+      60%, 100% { opacity: 1; }
+    }
+
+    @media (max-width: 900px) {
+      .did-you-know-sidebar { display: none !important; }
+    }
+*/
+
+
+// ============================================================================
+// CHANGE 4: REPLACE THE LOADING PAGE (PAGE 1) LOGO + WELCOME TEXT
+// Replace the Logo and "Welcome, Chef!" section with this:
+// ============================================================================
+/*
+  FIND THIS in Page 1:
+    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', animation: 'fadeUp 0.7s ease-out' }}>
+      <LetsEatLogo size={360} />
+    </div>
+
+  REPLACE WITH:
+    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', animation: 'fadeUp 0.7s ease-out' }}>
       <img
         src={LOADING_GIF}
         alt="Kitchen Magic Loading"
-        style={styles.loadingGif}
+        style={{
+          width: '280px', height: '280px', borderRadius: '20px',
+          objectFit: 'cover',
+          boxShadow: '0 10px 40px rgba(243,146,0,0.35)',
+          filter: 'drop-shadow(0 0 18px rgba(243,146,0,0.4))',
+        }}
       />
-
-      {/* Animated alternating text */}
-      <div style={styles.loadingTextContainer}>
-        <div
-          key={textIndex}
-          style={{
-            ...styles.loadingText,
-            animation: 'fadeInUp 0.5s ease',
-          }}
-        >
-          {loadingTexts[textIndex]}
-        </div>
-      </div>
-
-      {/* Language Selection */}
-      <div style={styles.languageSection}>
-        <div style={styles.languageLabel}>{t.selectLanguage}</div>
-        <div style={styles.languageGrid}>
-          {LANGUAGE_OPTIONS.map(lang => (
-            <button
-              key={lang.code}
-              className="km-lang-btn"
-              style={styles.languageBtn(language === lang.code)}
-              onClick={() => setLanguage(lang.code)}
-            >
-              {lang.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Get Started Button */}
-      <button
-        className="km-btn"
-        style={styles.getStartedBtn}
-        onClick={onStart}
-      >
-        {t.getStarted}
-      </button>
     </div>
-  );
-};
 
-// ─── Recipe Card Component (improved layout) ─────────────────────────────────
-const RecipeCard = ({ recipe, t }) => {
-  if (!recipe) return null;
+  AND replace the static "Welcome, Chef!" h2 text with: {t.welcomeChef}
+  AND replace "Tell us your name..." p text with: {t.tellUs}
+  AND replace "Your name..." placeholder with: {t.yourName}
+  AND replace "Let's Cook! 🍳" button text with: {t.letsCook}
+*/
 
-  return (
-    <div style={styles.recipeCard} className="km-recipe-card">
-      <div style={styles.recipeCardHeader}>
-        <div style={styles.recipeTitle}>{recipe.title || t.recipeResult}</div>
-        <div style={styles.recipeMeta}>
-          {recipe.servings && (
-            <span style={styles.recipeMetaItem}>
-              {t.servings}: <span style={styles.recipeMetaValue}>{recipe.servings}</span>
-            </span>
-          )}
-          {recipe.prepTime && (
-            <span style={styles.recipeMetaItem}>
-              {t.prepTime}: <span style={styles.recipeMetaValue}>{recipe.prepTime}</span>
-            </span>
-          )}
-          {recipe.cookTime && (
-            <span style={styles.recipeMetaItem}>
-              {t.cookTime}: <span style={styles.recipeMetaValue}>{recipe.cookTime}</span>
-            </span>
-          )}
-        </div>
+
+// ============================================================================
+// CHANGE 5: ADD LANGUAGE SELECTOR ON PAGE 1
+// Insert BEFORE the Terms & Conditions box on Page 1:
+// ============================================================================
+/*
+    {/* Language Selector * /}
+    <div style={{
+      marginBottom: '24px', textAlign: 'left',
+      background: 'var(--cream)', borderRadius: '12px',
+      padding: '16px 20px',
+      border: '1px solid rgba(243,146,0,0.3)',
+    }}>
+      <div style={{
+        fontSize: '11px', fontWeight: '800', color: 'var(--brown-mid)',
+        textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px',
+      }}>
+        {t.selectLang}
       </div>
-      <div style={styles.recipeCardBody}>
-        {/* Ingredients */}
-        {recipe.ingredients && recipe.ingredients.length > 0 && (
-          <>
-            <div style={styles.recipeIngredientsTitle}>{t.ingredients}</div>
-            {recipe.ingredients.map((ing, i) => (
-              <div key={i} style={styles.recipeIngredientItem}>• {ing}</div>
-            ))}
-          </>
-        )}
-        {/* Instructions */}
-        {recipe.instructions && recipe.instructions.length > 0 && (
-          <>
-            <div style={styles.recipeInstructionsTitle}>{t.instructions}</div>
-            {recipe.instructions.map((step, i) => (
-              <div key={i} style={styles.recipeInstructionStep}>
-                <span style={styles.stepNumber}>{i + 1}</span>
-                {step}
-              </div>
-            ))}
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ─── Main RecipeGenerator Component ──────────────────────────────────────────
-const RecipeGenerator = () => {
-  const [page, setPage] = useState('loading'); // 'loading' | 'main'
-  const [language, setLanguage] = useState('en');
-  const [ingredients, setIngredients] = useState([]);
-  const [ingredientInput, setIngredientInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [recipe, setRecipe] = useState(null);
-  const [error, setError] = useState(null);
-
-  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
-
-  useEffect(() => {
-    injectStyles();
-  }, []);
-
-  // Add ingredient
-  const addIngredient = () => {
-    const trimmed = ingredientInput.trim();
-    if (trimmed && !ingredients.includes(trimmed)) {
-      setIngredients(prev => [...prev, trimmed]);
-      setIngredientInput('');
-    }
-  };
-
-  const removeIngredient = (ing) => {
-    setIngredients(prev => prev.filter(i => i !== ing));
-  };
-
-  const clearIngredients = () => {
-    setIngredients([]);
-  };
-
-  // Recipe generation (verified working flow)
-  const generateRecipe = async () => {
-    if (ingredients.length === 0 && !searchQuery.trim()) return;
-
-    setIsGenerating(true);
-    setError(null);
-    setRecipe(null);
-
-    try {
-      const prompt = searchQuery.trim()
-        ? `Generate a detailed recipe for: ${searchQuery}. Language: ${language}`
-        : `Generate a detailed recipe using these ingredients: ${ingredients.join(', ')}. Language: ${language}`;
-
-      // Using Anthropic API via serverless proxy
-      const response = await fetch('/.netlify/functions/anthropic-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 1500,
-          messages: [
-            {
-              role: 'user',
-              content: `${prompt}
-
-Please respond ONLY with valid JSON in this exact format (no markdown, no backticks, no extra text):
-{
-  "title": "Recipe Name",
-  "servings": "4",
-  "prepTime": "15 min",
-  "cookTime": "30 min",
-  "ingredients": ["ingredient 1", "ingredient 2"],
-  "instructions": ["Step 1 description", "Step 2 description"]
-}`
-            }
-          ]
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API returned status ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      // Extract text content from response
-      let textContent = '';
-      if (data.content && Array.isArray(data.content)) {
-        textContent = data.content
-          .filter(item => item.type === 'text')
-          .map(item => item.text)
-          .join('');
-      } else if (typeof data.content === 'string') {
-        textContent = data.content;
-      } else if (data.text) {
-        textContent = data.text;
-      }
-
-      if (!textContent) {
-        throw new Error('No content in API response');
-      }
-
-      // Clean and parse JSON
-      const cleaned = textContent.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(cleaned);
-
-      // Validate recipe structure
-      if (!parsed.title || !parsed.ingredients || !parsed.instructions) {
-        throw new Error('Invalid recipe format returned');
-      }
-
-      setRecipe(parsed);
-    } catch (err) {
-      console.error('Recipe generation error:', err);
-      setError(t.errorMessage);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      addIngredient();
-    }
-  };
-
-  // ─── Render Loading Page (Page 1) ──────────────────────────────────────
-  if (page === 'loading') {
-    return (
-      <div style={styles.container}>
-        <LoadingPage
-          language={language}
-          setLanguage={setLanguage}
-          onStart={() => setPage('main')}
-          t={t}
-        />
-      </div>
-    );
-  }
-
-  // ─── Render Main Page (Page 2) ─────────────────────────────────────────
-  return (
-    <div style={styles.container}>
-      <div style={styles.mainPage} className="km-main-page">
-        {/* Sidebar with Did You Know */}
-        <DidYouKnowSidebar t={t} />
-
-        {/* Main Content */}
-        <div style={styles.mainContent} className="km-main-content">
-          {/* Header */}
-          <div style={styles.header}>
-            <div style={styles.title} className="km-header-title">{t.appTitle}</div>
-            <button
-              style={styles.backBtn}
-              onClick={() => { setPage('loading'); setRecipe(null); setError(null); }}
-            >
-              {t.back}
-            </button>
-          </div>
-
-          {/* Ingredients Section — TEXT ONLY, no images */}
-          <div style={styles.section}>
-            <div style={styles.sectionTitle}>{t.ingredients}</div>
-            <div style={styles.inputRow}>
-              <input
-                type="text"
-                className="km-input"
-                style={styles.textInput}
-                placeholder={t.ingredientPlaceholder}
-                value={ingredientInput}
-                onChange={e => setIngredientInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-              />
-              <button
-                style={styles.addBtn}
-                onClick={addIngredient}
-              >
-                {t.addIngredient}
-              </button>
-            </div>
-            {ingredients.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={styles.ingredientTags}>
-                  {ingredients.map((ing, i) => (
-                    <span key={i} style={styles.ingredientTag} className="km-tag">
-                      {ing}
-                      <button
-                        className="km-tag-remove"
-                        style={styles.removeTagBtn}
-                        onClick={() => removeIngredient(ing)}
-                        title={t.removeIngredient}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <button style={styles.clearBtn} onClick={clearIngredients}>
-                  {t.clearAll}
-                </button>
-              </div>
-            )}
-            {ingredients.length === 0 && (
-              <div style={{ fontSize: '13px', color: '#808098', fontStyle: 'italic' }}>
-                {t.noIngredients}
-              </div>
-            )}
-          </div>
-
-          {/* Search Section — TEXT ONLY, no images */}
-          <div style={styles.section}>
-            <div style={styles.sectionTitle}>{t.search}</div>
-            <input
-              type="text"
-              className="km-input"
-              style={styles.searchInput}
-              placeholder={t.searchPlaceholder}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          {/* Generate Button */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        {LANGUAGES.map(lang => (
           <button
-            className="km-btn"
+            key={lang.code}
+            onClick={() => setLanguage(lang.code)}
             style={{
-              ...styles.generateBtn,
-              ...(isGenerating || (ingredients.length === 0 && !searchQuery.trim()) ? styles.generateBtnDisabled : {}),
+              padding: '8px 14px', borderRadius: '8px',
+              border: language === lang.code
+                ? '2px solid var(--amber)'
+                : '1.5px solid var(--border)',
+              background: language === lang.code
+                ? 'rgba(243,146,0,0.12)' : 'white',
+              color: language === lang.code
+                ? 'var(--brown-warm)' : 'var(--text-mid)',
+              fontSize: '13px', fontWeight: '700',
+              fontFamily: "'Nunito', sans-serif",
+              cursor: 'pointer', transition: 'all 0.2s ease',
             }}
-            onClick={generateRecipe}
-            disabled={isGenerating || (ingredients.length === 0 && !searchQuery.trim())}
           >
-            {isGenerating ? '⏳ ' + t.generating : t.generateRecipe}
+            {lang.label}
           </button>
-
-          {/* Generating Spinner */}
-          {isGenerating && (
-            <div style={styles.generatingContainer}>
-              <div style={styles.generatingSpinner} />
-              <div style={{ color: '#a0a0b8', fontSize: '14px' }}>{t.generating}</div>
-            </div>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div style={{ ...styles.errorBox, marginTop: '16px' }}>
-              {error}
-              <button
-                style={{ ...styles.addBtn, marginLeft: '12px', fontSize: '12px', padding: '6px 14px' }}
-                onClick={generateRecipe}
-              >
-                {t.tryAgain}
-              </button>
-            </div>
-          )}
-
-          {/* Recipe Result */}
-          {recipe && <RecipeCard recipe={recipe} t={t} />}
-        </div>
+        ))}
       </div>
     </div>
-  );
-};
+*/
 
-export default RecipeGenerator;
+
+// ============================================================================
+// CHANGE 6: ADD DID YOU KNOW SIDEBAR TO PAGE 2
+// Insert inside the Page 2 return, right after the opening background blobs:
+// ============================================================================
+/*
+    {/* Did You Know Sidebar * /}
+    <DidYouKnowSidebar t={t} />
+*/
+
+
+// ============================================================================
+// CHANGE 7: UPDATE PAGE 2 WELCOME TEXT TO USE TRANSLATIONS
+// ============================================================================
+/*
+  FIND: Welcome back, <strong ...>{userName || 'Chef'}</strong>! What are we cooking today?
+  REPLACE WITH: <span dangerouslySetInnerHTML={{ __html: t.welcomeBack(userName) }} />
+
+  Or more simply just replace the text content with: {t.welcomeBack(userName)}
+*/
+
+
+// ============================================================================
+// CHANGE 8: UPDATE LOADING STATE TO USE GIF + ANIMATED TEXT
+// Replace the loading section (the one with cookBounce animation) with:
+// ============================================================================
+/*
+    {loading && (
+      <div style={{
+        textAlign: 'center', padding: '60px 20px',
+        background: 'transparent', borderRadius: '20px'
+      }}>
+        <div style={{ marginBottom: '24px' }}>
+          <img
+            src={LOADING_GIF}
+            alt="Cooking..."
+            style={{
+              width: '200px', height: '200px', borderRadius: '16px',
+              objectFit: 'cover',
+              boxShadow: '0 8px 30px rgba(243,146,0,0.3)',
+            }}
+          />
+        </div>
+        <p style={{
+          fontFamily: "'Playfair Display', serif",
+          fontSize: '22px', fontWeight: '700',
+          color: 'var(--brown-dark)', marginBottom: '8px',
+          animation: 'textCycle 3s ease-in-out infinite',
+        }}>{t.cookingUp}</p>
+        <p style={{ color: 'var(--text-light)', fontSize: '14px', fontWeight: '500' }}>
+          {t.hangTight}
+        </p>
+      </div>
+    )}
+*/
+
+
+// ============================================================================
+// CHANGE 9: IMPROVE RECIPE CARD LAYOUT
+// In the recipe card rendering, change these styles:
+// ============================================================================
+/*
+  FIND the recipe card wrapper:
+    style={{ animationDelay: ..., background: 'transparent', borderRadius: '20px', padding: '32px', marginBottom: '22px' }}
+
+  REPLACE WITH:
+    style={{
+      animationDelay: `${index * 0.1}s`,
+      background: 'rgba(255,255,255,0.5)',
+      border: '1px solid rgba(93,42,24,0.1)',
+      borderRadius: '24px',
+      padding: '32px 28px',
+      marginBottom: '24px',
+      maxWidth: '720px',
+      margin: '0 auto 24px',
+      backdropFilter: 'blur(6px)',
+      boxShadow: '0 4px 20px rgba(93,42,24,0.08)',
+    }}
+*/
+
+
+// ============================================================================
+// CHANGE 10: REMOVE IMAGE ICONS FROM INGREDIENT CHIPS IN RECIPE CARDS
+// In the ingredients grid inside recipe cards:
+// ============================================================================
+/*
+  FIND:
+    <span style={{ fontSize: '16px' }}>{getIngredientIcon(ing)}</span> {ing}
+
+  REPLACE WITH:
+    <span style={{ color: 'var(--brown-warm)', fontSize: '14px' }}>•</span> {ing}
+*/
+
+
+// ============================================================================
+// CHANGE 11: REMOVE IMAGE ICON FROM INPUT AUTOCOMPLETE
+// In the autocomplete dropdown items:
+// ============================================================================
+/*
+  FIND:
+    {getIngredientIcon(item)} {item}
+
+  REPLACE WITH:
+    {item}
+*/
+
+
+// ============================================================================
+// CHANGE 12: HARDEN RECIPE GENERATION JSON PARSING
+// The existing generateRecipes function already has good JSON parsing.
+// Add this additional fallback inside the catch block:
+// ============================================================================
+/*
+  After the existing JSON.parse attempts, add before the final throw:
+
+  // Third attempt: try to extract individual recipe objects
+  try {
+    const recipePattern = /\{[^{}]*"name"[^{}]*"instructions"[^{}]*\}/gs;
+    const matches = text.match(recipePattern);
+    if (matches && matches.length > 0) {
+      generatedRecipes = matches.map(m => JSON.parse(m));
+    }
+  } catch (thirdError) {
+    // Fall through to the throw below
+  }
+*/
