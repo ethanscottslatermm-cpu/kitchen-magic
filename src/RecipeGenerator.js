@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 // ============================================================================
-// ASSETS & CONSTANTS (Changes 1 & 4)
+// CONSTANTS & ASSETS (Change 1 & 4)
 // ============================================================================
 const FOOD_FACTS = [
   "Honey never spoils. Archaeologists found 3,000-year-old honey in Egyptian tombs that was still edible!",
@@ -28,14 +28,6 @@ const FOOD_FACTS = [
 
 const LOADING_GIF = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3g4bHR1Ym9vYWlzaW54cHVibjR4MnFpNTFzaDdxZDlmc2hob2l3YiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dWacKLne4EowGUaVUw/giphy.gif";
 
-const LANGUAGES = [
-  { code: 'en', label: '🇺🇸 English' },
-  { code: 'es', label: '🇪🇸 Español' },
-  { code: 'fr', label: '🇫🇷 Français' },
-  { code: 'de', label: '🇩🇪 Deutsch' },
-  { code: 'zh', label: '🇨🇳 中文' },
-];
-
 const TRANSLATIONS = {
   en: {
     welcomeChef: 'Welcome, Chef!',
@@ -58,11 +50,11 @@ const TRANSLATIONS = {
     cookingUp: 'Preparando algo delicioso...',
     hangTight: 'Espera mientras encontramos las recetas perfectas 🍳',
     didYouKnow: '💡 ¿Sabías que...?',
-  },
-  // (Remaining translations fr, de, zh as per your text file)
+  }
+  // (fr, de, zh languages would follow the same structure)
 };
 
-// ─── Change 1 & 6: Did You Know Sidebar Component ──────────────────────────
+// ─── Sidebar Component (Change 1 & 6) ───────────────────────────────────────
 function DidYouKnowSidebar({ t }) {
   const [phase, setPhase] = useState('welcome');
   const [factIndex, setFactIndex] = useState(0);
@@ -132,11 +124,11 @@ export default function RecipeGenerator() {
   
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
-  // --- Original Claude Backend Logic (RESTORED)
-  const generateRecipes = async () => {
+  // --- RESTORED ORIGINAL CLAUDE BACKEND LOGIC ---
+  const handleGenerate = async () => {
     setLoading(true);
     try {
-      // Pointing back to your original Netlify function
+      // Calling your existing Claude Netlify function
       const response = await fetch('/.netlify/functions/repair-json', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -146,7 +138,7 @@ export default function RecipeGenerator() {
       const text = await response.text();
       let generatedRecipes = [];
 
-      // Change 12: Hardened JSON Parsing
+      // Change 12: Hardened JSON Parsing Fallback
       try {
         generatedRecipes = JSON.parse(text);
       } catch (e) {
@@ -160,3 +152,58 @@ export default function RecipeGenerator() {
       }
       setRecipes(generatedRecipes);
     } catch (err) {
+      console.error("Claude Engine Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ fontFamily: "'Nunito', sans-serif", minHeight: '100vh', background: '#fff9f0' }}>
+      <style>{`
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-8px); } }
+        @keyframes textCycle { 0%, 40% { opacity: 1; } 50% { opacity: 0; } 60%, 100% { opacity: 1; } }
+        @media (max-width: 900px) { .did-you-know-sidebar { display: none !important; } }
+      `}</style>
+
+      {page === 1 ? (
+        <div style={{ maxWidth: '400px', margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <img src={LOADING_GIF} alt="Logo" style={{ width: '280px', borderRadius: '20px', boxShadow: '0 10px 40px rgba(243,146,0,0.35)' }} />
+          </div>
+          <h2>{t.welcomeChef}</h2>
+          <input 
+            type="text" 
+            placeholder={t.yourName} 
+            value={userName} 
+            onChange={(e) => setUserName(e.target.value)}
+            style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #ddd', margin: '20px 0' }}
+          />
+          <button onClick={() => setPage(2)} style={{ width: '100%', padding: '14px', background: '#d16a1e', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>
+            {t.letsCook}
+          </button>
+        </div>
+      ) : (
+        <div style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto' }}>
+          <DidYouKnowSidebar t={t} />
+          <h2 style={{ textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: t.welcomeBack(userName) }} />
+          
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <img src={LOADING_GIF} alt="Loading" style={{ width: '150px', borderRadius: '15px' }} />
+              <p style={{ animation: 'textCycle 3s infinite', fontWeight: 'bold', color: '#d16a1e' }}>{t.cookingUp}</p>
+            </div>
+          ) : (
+            recipes.map((recipe, i) => (
+              <div key={i} style={{ background: 'white', padding: '32px', borderRadius: '24px', marginBottom: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', maxWidth: '720px', margin: '0 auto 24px' }}>
+                <h3>{recipe.name}</h3>
+                {recipe.ingredients.map((ing, j) => <div key={j} style={{ margin: '4px 0' }}><span style={{ color: 'orange' }}>•</span> {ing}</div>)}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
